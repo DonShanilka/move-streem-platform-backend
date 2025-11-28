@@ -1,20 +1,14 @@
 package main
 
 import (
-    "log"
-    "github.com/DonShanilka/auth-service/internal/config"
-    "github.com/DonShanilka/auth-service/internal/routes"
-    "github.com/gofiber/fiber/v2"
+	//"log"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/DonShanilka/auth-service/internal/routes"
 )
 
 func main() {
     app := fiber.New()
-
-    // Database connect
-    config.ConnectDB()
-
-    // Load routes
     routes.SetupAuthRoutes(app)
-
-    log.Fatal(app.Listen(":9002"))
+    app.Listen(":9002")
 }

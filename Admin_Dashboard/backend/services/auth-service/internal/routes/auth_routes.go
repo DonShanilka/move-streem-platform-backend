@@ -1,8 +1,9 @@
+// auth-service/internal/routes/routes.go
 package routes
 
 import (
-    "github.com/DonShanilka/auth-service/internal/handlers"
     "github.com/gofiber/fiber/v2"
+    "github.com/DonShanilka/auth-service/internal/handlers"
 )
 
 func SetupAuthRoutes(app *fiber.App) {
