@@ -3,17 +3,21 @@ package main
 import (
 	"log"
 
-	"github.com/DonShanilka/auth-service/internal/database"
 	"github.com/DonShanilka/auth-service/internal/routes"
+    "github.com/DonShanilka/auth-service/internal/config"
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	database.Connect("mongodb://localhost:27017") // <-- Your MongoDB URI
 
 	app := fiber.New()
-	routes.SetupAuthRoutes(app)
+	
+    cfg, err := config.LoadConfig()
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	log.Println("Auth Service running on :9002")
-	log.Fatal(app.Listen(":9002"))
+    routes.AuthRoutes(app, cfg)
+    log.Println("Auth Service running")
+    app.Listen(":" + cfg.Port)
 }
