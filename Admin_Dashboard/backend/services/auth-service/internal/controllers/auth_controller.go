@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/DonShanilka/auth-service/internal/models"	
-	"github.com/DonShanilka/auth-service/internal/service"
+	"github.com/DonShanilka/auth-service/internal/models"
+	"github.com/DonShanilka/auth-service/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 )

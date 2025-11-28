@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/DonShanilka/auth-service/internal/models"	
+	"github.com/DonShanilka/auth-service/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

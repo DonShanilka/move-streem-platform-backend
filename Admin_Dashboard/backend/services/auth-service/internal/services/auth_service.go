@@ -15,13 +15,13 @@ type AuthService interface {
 }
 
 type authService struct {
-    UserRepo repository.UserRepository
+    repo repository.UserRepository
     JWTSecret string
 }
 
 func NewAuthService(repo repository.UserRepository, jwtSecret string) AuthService {
     return &authService{
-        UserRepo: repo,
+        repo: repo,
         JWTSecret: jwtSecret,
     }
 }
@@ -29,11 +29,11 @@ func NewAuthService(repo repository.UserRepository, jwtSecret string) AuthServic
 func (s *authService) Register(user *models.User) error {
     hash, _:= bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
     user.Password = string(hash)
-    return s.UserRepo.CreateUser(user)
+    return s.repo.CreateUser(user)
 }
 
 func (s *authService) Login(email, password string) (*models.TokenResponse, error) {
-    user, err := s.UserRepo.FindUserByEmail(email)
+    user, err := s.repo.FindUserByEmail(email)
     if err != nil {
         return nil, errors.New("Email not found")
     }

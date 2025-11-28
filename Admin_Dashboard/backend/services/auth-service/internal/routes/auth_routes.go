@@ -1,12 +1,18 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/DonShanilka/auth-service/internal/handlers"
+    "github.com/DonShanilka/auth-service/internal/handlers"
+    "github.com/DonShanilka/auth-service/internal/config"
+    "go.mongodb.org/mongo-driver/mongo"
+    "github.com/gofiber/fiber/v2"
 )
 
-func SetupAuthRoutes(app *fiber.App) {
-	api := app.Group("/auth") // Auth service prefix
-	api.Post("/register", handlers.Register)
-	api.Post("/login", handlers.Login)
+func AuthRoutes(app *fiber.App, cfg *config.Config) {
+    client, _ := mongo.Connect(nil)
+    db := client.Database(cfg.Database)
+    authHandler := handlers.InitAuthHandler(db, cfg)
+
+    authGroup := app.Group("/api/auth")
+    authGroup.Post("/register", authHandler.Register)
+    // authGroup.Post("/login", authHandler.Login)
 }

@@ -11,7 +11,7 @@ import (
 func main() {
 
 	app := fiber.New()
-	
+
     cfg, err := config.LoadConfig()
     if err != nil {
         log.Fatal(err)
