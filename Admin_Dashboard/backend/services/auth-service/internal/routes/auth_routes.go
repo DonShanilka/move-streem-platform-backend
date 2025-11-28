@@ -2,9 +2,10 @@ package routes
 
 import (
     "github.com/DonShanilka/auth-service/internal/handlers"
-    "github.com/DonShanilka/auth-service/internal/config"
-    "go.mongodb.org/mongo-driver/mongo"
     "github.com/gofiber/fiber/v2"
+    "github.com/DonShanilka/auth-service/internal/config"
+
+    "go.mongodb.org/mongo-driver/mongo"
 )
 
 func AuthRoutes(app *fiber.App, cfg *config.Config) {
