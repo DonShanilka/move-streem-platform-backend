@@ -11,7 +11,7 @@ import (
 
 type AuthService interface {
     Register(user *models.User) error
-    Login(email, password string) (string, error)
+    Login(email, password string) (*models.TokenResponse, error)
 }
 
 type authService struct {
@@ -51,6 +51,5 @@ func (s *authService) Login(email, password string) (*models.TokenResponse, erro
 
     tokenString, _ := token.SignedString([]byte(s.JWTSecret))
     
-
     return &models.TokenResponse{Token: tokenString}, nil
 }
