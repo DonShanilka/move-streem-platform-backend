@@ -4,7 +4,7 @@ import (
 	"github.com/DonShanilka/auth-service/internal/config"
 	"github.com/DonShanilka/auth-service/internal/controllers"
 	"github.com/DonShanilka/auth-service/internal/repository"
-	"github.com/DonShanilka/auth-service/internal/services"
+	"github.com/DonShanilka/auth-service/internal/service"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
