@@ -14,8 +14,10 @@ func NewMovieService(db *sql.DB) *MovieService {
 }
 
 func (s *MovieService) SaveMovie(movie models.Movie) error {
-    query := `INSERT INTO movies (title, description, genre, release_year, duration, video_url) VALUES (?, ?, ?, ?, ?, ?)`
-    _, err := s.DB.Exec(query, movie.Title, movie.Description, movie.Genre, movie.ReleaseYear, movie.Duration, movie.VideoURL)
+    query := `INSERT INTO movies (title, description, genre, release_year, duration, video_url)
+              VALUES (?, ?, ?, ?, ?, ?)`
+    _, err := s.DB.Exec(query, movie.Title, movie.Description, movie.Genre, movie.ReleaseYear,
+        movie.Duration, movie.VideoURL)
     return err
 }
 
@@ -27,6 +29,7 @@ func (s *MovieService) GetAllMovies() ([]models.Movie, error) {
     defer rows.Close()
 
     var movies []models.Movie
+
     for rows.Next() {
         var m models.Movie
         if err := rows.Scan(&m.ID, &m.Title, &m.Description, &m.Genre, &m.ReleaseYear, &m.Duration, &m.VideoURL); err != nil {

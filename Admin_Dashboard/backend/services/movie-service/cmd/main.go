@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "net/http"
+
     "github.com/DonShanilka/movie-service/internal/handlers"
     "github.com/DonShanilka/movie-service/internal/repository"
     "github.com/DonShanilka/movie-service/internal/routes"
@@ -10,19 +11,31 @@ import (
 )
 
 func main() {
-    // Initialize DB (MySQL)
     db, err := repository.InitDB()
     if err != nil {
         log.Fatal(err)
     }
 
-    // Initialize services and handlers
     movieService := services.NewMovieService(db)
     movieHandler := handlers.NewMovieHandler(movieService)
 
-    // Setup routes
-    handler := routes.SetupRoutes(movieHandler)
+    mux := http.NewServeMux()
+    routes.RegisterMovieRoutes(mux, movieHandler)
 
-    log.Println("Server running at :8080")
+    // Global CORS middleware
+    handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+        if r.Method == http.MethodOptions {
+            return
+        }
+
+        mux.ServeHTTP(w, r)
+    })
+
+    log.Println("Server running at http://localhost:8080 ✅")
     log.Fatal(http.ListenAndServe(":8080", handler))
 }

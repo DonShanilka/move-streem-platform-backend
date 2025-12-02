@@ -2,13 +2,13 @@ package handlers
 
 import (
     "encoding/json"
-    // "fmt"
     "io"
     "net/http"
     "os"
+    "strconv"
+
     "github.com/DonShanilka/movie-service/internal/models"
     "github.com/DonShanilka/movie-service/internal/services"
-    "strconv"
 )
 
 type MovieHandler struct {
@@ -19,14 +19,17 @@ func NewMovieHandler(service *services.MovieService) *MovieHandler {
     return &MovieHandler{Service: service}
 }
 
-// UploadMovie handles POST /upload
 func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
         return
     }
 
-    r.ParseMultipartForm(10 << 30) // 10 GB max file size
+    err := r.ParseMultipartForm(10 << 30)
+    if err != nil {
+        http.Error(w, "Invalid form-data: "+err.Error(), http.StatusBadRequest)
+        return
+    }
 
     file, handler, err := r.FormFile("file")
     if err != nil {
@@ -35,50 +38,52 @@ func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
     }
     defer file.Close()
 
-    title := r.FormValue("title")
-    description := r.FormValue("description")
-    genre := r.FormValue("genre")
-    releaseYear, _ := strconv.Atoi(r.FormValue("release_year"))
-    duration, _ := strconv.Atoi(r.FormValue("duration"))
-
-    // Save file to local folder
+    // store file
     os.MkdirAll("./videos", os.ModePerm)
     filePath := "./videos/" + handler.Filename
-    dst, _ := os.Create(filePath)
+    dst, err := os.Create(filePath)
+    if err != nil {
+        http.Error(w, "File saving error: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
     defer dst.Close()
     io.Copy(dst, file)
 
     movie := models.Movie{
-        Title:       title,
-        Description: description,
-        Genre:       genre,
-        ReleaseYear: releaseYear,
-        Duration:    duration,
+        Title:       r.FormValue("title"),
+        Description: r.FormValue("description"),
+        Genre:       r.FormValue("genre"),
+        ReleaseYear: atoiSafe(r.FormValue("release_year")),
+        Duration:    atoiSafe(r.FormValue("duration")),
         VideoURL:    "/videos/" + handler.Filename,
     }
 
-    err = h.Service.SaveMovie(movie)
-    if err != nil {
+    if err := h.Service.SaveMovie(movie); err != nil {
         http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
         return
     }
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(map[string]string{
-        "message":   "Movie uploaded successfully",
-        "file_name": handler.Filename,
+    jsonResponse(w, map[string]string{
+        "message": "Movie uploaded successfully",
+        "file":    handler.Filename,
     })
 }
 
-// ListMovies handles GET /movies
 func (h *MovieHandler) ListMovies(w http.ResponseWriter, r *http.Request) {
     movies, err := h.Service.GetAllMovies()
     if err != nil {
         http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
         return
     }
+    jsonResponse(w, movies)
+}
 
-    // Return JSON response
+func atoiSafe(s string) int {
+    val, _ := strconv.Atoi(s)
+    return val
+}
+
+func jsonResponse(w http.ResponseWriter, data interface{}) {
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(movies)
+    json.NewEncoder(w).Encode(data)
 }

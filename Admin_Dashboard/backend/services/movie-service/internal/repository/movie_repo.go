@@ -13,12 +13,10 @@ func InitDB() (*sql.DB, error) {
         return nil, err
     }
 
-    // Test connection
     if err := db.Ping(); err != nil {
         return nil, err
     }
 
-    // Create table if not exists
     query := `CREATE TABLE IF NOT EXISTS movies (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255),
@@ -28,6 +26,7 @@ func InitDB() (*sql.DB, error) {
         duration INT,
         video_url VARCHAR(500)
     );`
+
     _, err = db.Exec(query)
     if err != nil {
         return nil, err

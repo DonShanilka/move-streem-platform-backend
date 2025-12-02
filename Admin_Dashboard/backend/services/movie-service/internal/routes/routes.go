@@ -5,14 +5,17 @@ import (
     "github.com/DonShanilka/movie-service/internal/handlers"
 )
 
-// SetupRoutes registers all routes and returns a handler
-func SetupRoutes(movieHandler *handlers.MovieHandler) http.Handler {
-    mux := http.NewServeMux()
+func RegisterMovieRoutes(mux *http.ServeMux, movieHandler *handlers.MovieHandler) {
 
-    // Movie routes
-    mux.HandleFunc("/upload", movieHandler.UploadMovie)
-    mux.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir("./videos"))))
-    mux.HandleFunc("/movies", movieHandler.ListMovies)
+    // API Routes
+    mux.HandleFunc("/api/movies/upload", movieHandler.UploadMovie)
+    mux.HandleFunc("/api/movies", movieHandler.ListMovies)
 
-    return mux
+    // Correct video serving
+    mux.Handle("/videos/",
+        http.StripPrefix("/videos/",
+            http.FileServer(http.Dir("./videos")),
+        ),
+    )
 }
+
