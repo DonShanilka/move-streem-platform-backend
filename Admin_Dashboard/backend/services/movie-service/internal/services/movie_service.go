@@ -2,49 +2,44 @@ package services
 
 import (
     "database/sql"
+    "fmt"
+
     "github.com/DonShanilka/movie-service/internal/models"
+    "github.com/DonShanilka/movie-service/internal/repository"
 )
 
 type MovieService struct {
-    DB *sql.DB
+    Repo *repository.MovieRepository
 }
 
 func NewMovieService(db *sql.DB) *MovieService {
-    return &MovieService{DB: db}
+    return &MovieService{
+        Repo: repository.NewMovieRepository(db),
+    }
 }
 
 func (s *MovieService) SaveMovie(movie models.Movie) error {
-    query := `
-        INSERT INTO movies (title, description, genre, release_year, duration, file)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `
-    _, err := s.DB.Exec(query,
-        movie.Title,
-        movie.Description,
-        movie.Genre,
-        movie.ReleaseYear,
-        movie.Duration,
-        movie.File,
-    )
-    return err
+    return s.Repo.SaveMovie(movie)
 }
 
-
 func (s *MovieService) GetAllMovies() ([]models.Movie, error) {
-    rows, err := s.DB.Query("SELECT id, title, description, genre, release_year, duration, file FROM movies")
+    movies, err := s.Repo.GetAllMovies()
     if err != nil {
         return nil, err
     }
-    defer rows.Close()
 
-    var movies []models.Movie
+    for i := range movies {
+        // Remove file
+        movies[i].File = nil
 
-    for rows.Next() {
-        var m models.Movie
-        if err := rows.Scan(&m.ID, &m.Title, &m.Description, &m.Genre, &m.ReleaseYear, &m.Duration, &m.File); err != nil {
-            return nil, err
-        }
-        movies = append(movies, m)
+        // Add video URL
+        movies[i].VideoURL = fmt.Sprintf("http://localhost:8080/api/movies/stream?id=%d", movies[i].ID)
     }
+
     return movies, nil
+}
+
+
+func (s *MovieService) GetMovieFile(id int) ([]byte, error) {
+    return s.Repo.GetMovieFile(id)
 }
