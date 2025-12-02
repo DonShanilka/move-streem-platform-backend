@@ -7,6 +7,6 @@ type Movie struct {
     Genre       string `json:"genre"`
     ReleaseYear int    `json:"release_year"`
     Duration    int    `json:"duration"`
-    VideoURL    string `json:"video_url"`
+    File       []byte `json:"file"`
 }
 

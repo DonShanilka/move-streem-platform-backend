@@ -24,7 +24,7 @@ func InitDB() (*sql.DB, error) {
         genre VARCHAR(100),
         release_year YEAR,
         duration INT,
-        video_url VARCHAR(500)
+        file LONGBLOB
     );`
 
     _, err = db.Exec(query)

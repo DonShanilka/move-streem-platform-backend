@@ -4,7 +4,6 @@ import (
     "encoding/json"
     "io"
     "net/http"
-    "os"
     "strconv"
 
     "github.com/DonShanilka/movie-service/internal/models"
@@ -25,12 +24,14 @@ func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    err := r.ParseMultipartForm(10 << 30)
+    // Must parse multipart form
+    err := r.ParseMultipartForm(50 << 30) // 50GB max
     if err != nil {
         http.Error(w, "Invalid form-data: "+err.Error(), http.StatusBadRequest)
         return
     }
 
+    // Read file
     file, handler, err := r.FormFile("file")
     if err != nil {
         http.Error(w, "File error: "+err.Error(), http.StatusBadRequest)
@@ -38,16 +39,12 @@ func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
     }
     defer file.Close()
 
-    // store file
-    os.MkdirAll("./videos", os.ModePerm)
-    filePath := "./videos/" + handler.Filename
-    dst, err := os.Create(filePath)
+    // Read file bytes INTO RAM
+    fileBytes, err := io.ReadAll(file)
     if err != nil {
-        http.Error(w, "File saving error: "+err.Error(), http.StatusInternalServerError)
+        http.Error(w, "File read error: "+err.Error(), http.StatusInternalServerError)
         return
     }
-    defer dst.Close()
-    io.Copy(dst, file)
 
     movie := models.Movie{
         Title:       r.FormValue("title"),
@@ -55,7 +52,7 @@ func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
         Genre:       r.FormValue("genre"),
         ReleaseYear: atoiSafe(r.FormValue("release_year")),
         Duration:    atoiSafe(r.FormValue("duration")),
-        VideoURL:    "/videos/" + handler.Filename,
+        File:        fileBytes,
     }
 
     if err := h.Service.SaveMovie(movie); err != nil {
@@ -68,6 +65,7 @@ func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
         "file":    handler.Filename,
     })
 }
+
 
 func (h *MovieHandler) ListMovies(w http.ResponseWriter, r *http.Request) {
     movies, err := h.Service.GetAllMovies()
