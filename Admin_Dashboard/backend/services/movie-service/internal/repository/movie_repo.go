@@ -145,22 +145,39 @@ func InitDB() (*sql.DB, error) {
 
     // Episodes Table
     episodesTable := `CREATE TABLE IF NOT EXISTS episodes (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    series_id INT NOT NULL,
-    season_number INT NOT NULL,
-    episode_number INT NOT NULL,
-    title VARCHAR(255),
-    description TEXT,
-    duration INT,
-    thumbnail_url TEXT,
-    episode VARCHAR(255) NOT NULL,
-    release_date DATE,
-    FOREIGN KEY (series_id) REFERENCES series(id) ON DELETE CASCADE
-);`
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        series_id INT NOT NULL,
+        season_number INT NOT NULL,
+        episode_number INT NOT NULL,
+        title VARCHAR(255),
+        description TEXT,
+        duration INT,
+        thumbnail_url TEXT,
+        episode VARCHAR(255) NOT NULL,
+        release_date DATE,
+        FOREIGN KEY (series_id) REFERENCES series(id) ON DELETE CASCADE
+    );`
     _, err = db.Exec(episodesTable)
     if err != nil {
        return nil, err
     }
+
+    // Favorites Table
+    favoritesTable := `CREATE TABLE IF NOT EXISTS favorites (
+        user_id INT,
+        movie_id INT NULL,
+        series_id INT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, movie_id, series_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+        FOREIGN KEY (series_id) REFERENCES series(id) ON DELETE CASCADE
+    );`
+    _, err = db.Exec(favoritesTable)
+    if err != nil {
+       return nil, err
+    }
+
 
 	fmt.Println("✔ Database initialized: movies + genres tables created")
 	return db, nil
