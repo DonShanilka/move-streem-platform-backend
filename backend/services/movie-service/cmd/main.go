@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/DonShanilka/movie-service/internal/handlers"
-	"github.com/DonShanilka/movie-service/internal/repository"
+	"github.com/DonShanilka/movie-service/internal/db"
 	"github.com/DonShanilka/movie-service/internal/routes"
 	"github.com/DonShanilka/movie-service/internal/services"
 )
 
 func main() {
-	db, err := repository.InitDB()
+	db, err := db.InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
