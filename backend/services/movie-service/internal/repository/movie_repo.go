@@ -162,6 +162,19 @@ func InitDB() (*sql.DB, error) {
        return nil, err
     }
 
+    // Users Table
+    usersTable := `CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`
+    _, err = db.Exec(usersTable)
+    if err != nil {
+       return nil, err
+    }
+
     // Favorites Table
     favoritesTable := `CREATE TABLE IF NOT EXISTS favorites (
         user_id INT,
@@ -178,6 +191,22 @@ func InitDB() (*sql.DB, error) {
        return nil, err
     }
 
+    // Watch History Table
+    watchHistoryTable := `CREATE TABLE IF NOT EXISTS watch_history (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        movie_id INT NULL,
+        episode_id INT NULL,
+        progress INT CHECK (progress >= 0 AND progress <= 100),
+        last_watch_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE,
+        FOREIGN KEY (episode_id) REFERENCES episodes(id) ON DELETE CASCADE
+    );`
+    _, err = db.Exec(watchHistoryTable)
+    if err != nil {
+       return nil, err
+    }
 
 	fmt.Println("✔ Database initialized: movies + genres tables created")
 	return db, nil
