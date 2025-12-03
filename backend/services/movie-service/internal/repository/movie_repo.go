@@ -38,7 +38,9 @@ func (r *MovieRepository) SaveMovie(movie models.Movie) error {
 
 func (r *MovieRepository) GetAllMovies() ([]models.Movie, error) {
 	query := `SELECT id, title, description, release_year, language, duration, rating,
-         age_rating, country, thumbnail, banner, movie_url, trailer FROM movies`
+         age_rating, country, thumbnail, banner, movie_url, trailer 
+         FROM movies`
+
 	rows, err := r.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -53,9 +55,16 @@ func (r *MovieRepository) GetAllMovies() ([]models.Movie, error) {
 			&m.ID,
 			&m.Title,
 			&m.Description,
-			&m.Genre,
 			&m.ReleaseYear,
+			&m.Language,
 			&m.Duration,
+			&m.Rating,
+			&m.AgeRating,
+			&m.Country,
+			&m.Thumbnail,
+			&m.Banner,
+			&m.MovieURL,
+			&m.Trailer,
 		)
 		if err != nil {
 			return nil, err
@@ -63,8 +72,10 @@ func (r *MovieRepository) GetAllMovies() ([]models.Movie, error) {
 
 		movies = append(movies, m)
 	}
+
 	return movies, nil
 }
+
 
 func (r *MovieRepository) GetMovieFile(id int) ([]byte, error) {
 	query := `SELECT file FROM movies WHERE id = ?`
