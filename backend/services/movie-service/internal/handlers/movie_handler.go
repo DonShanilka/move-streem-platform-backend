@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+    "os"
 
 	"github.com/DonShanilka/movie-service/internal/models"
 	"github.com/DonShanilka/movie-service/internal/service"
@@ -18,56 +19,102 @@ func NewMovieHandler(service *services.MovieService) *MovieHandler {
     return &MovieHandler{Service: service}
 }
 
-// Upload movie with file stored in DB
 func (h *MovieHandler) UploadMovie(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
         return
     }
 
-    // Parse multipart form
-    err := r.ParseMultipartForm(50 << 30) // 50GB max
+    // Allow up to 2GB upload form (enough for local file)
+    err := r.ParseMultipartForm(2 << 30)
     if err != nil {
-        http.Error(w, "Error parsing form: "+err.Error(), http.StatusBadRequest)
+        http.Error(w, "Error parsing multipart form: "+err.Error(), http.StatusBadRequest)
         return
     }
 
-    // Read file
-    file, handler, err := r.FormFile("file")
+    // -------------------------
+    // 1️⃣ Read Movie File (store locally)
+    // -------------------------
+    movieFile, movieHeader, err := r.FormFile("movie")
     if err != nil {
-        http.Error(w, "Error reading file: "+err.Error(), http.StatusBadRequest)
+        http.Error(w, "Movie file required", http.StatusBadRequest)
         return
     }
-    defer file.Close()
+    defer movieFile.Close()
 
-    // Read file content
-    fileBytes, err := io.ReadAll(file)
+    movieBytes, err := io.ReadAll(movieFile)
     if err != nil {
-        http.Error(w, "Error reading file content: "+err.Error(), http.StatusInternalServerError)
+        http.Error(w, "Error reading movie file", http.StatusInternalServerError)
         return
     }
 
-    // create movie model
-    movie := models.Movie {
+    // Save movie to local folder
+    moviePath := "movies/" + movieHeader.Filename
+    err = os.WriteFile(moviePath, movieBytes, 0644)
+    if err != nil {
+        http.Error(w, "Error saving movie locally", http.StatusInternalServerError)
+        return
+    }
+
+    // -------------------------
+    // 2️⃣ Trailer (Save to MySQL as LONGBLOB)
+    // -------------------------
+    trailerFile, _, err := r.FormFile("trailer")
+    var trailerBytes []byte
+    if err == nil { // trailer is optional
+        defer trailerFile.Close()
+        trailerBytes, _ = io.ReadAll(trailerFile)
+    }
+
+    // -------------------------
+    // 3️⃣ Thumbnail (MEDIUMBLOB)
+    // -------------------------
+    thumbnailFile, _, err := r.FormFile("thumbnail")
+    var thumbnailBytes []byte
+    if err == nil {
+        defer thumbnailFile.Close()
+        thumbnailBytes, _ = io.ReadAll(thumbnailFile)
+    }
+
+    // -------------------------
+    // 4️⃣ Banner (MEDIUMBLOB)
+    // -------------------------
+    bannerFile, _, err := r.FormFile("banner")
+    var bannerBytes []byte
+    if err == nil {
+        defer bannerFile.Close()
+        bannerBytes, _ = io.ReadAll(bannerFile)
+    }
+
+    movie := models.Movie{
         Title:       r.FormValue("title"),
         Description: r.FormValue("description"),
-        Genre:       r.FormValue("genre"),
         ReleaseYear: atoiSafe(r.FormValue("release_year")),
         Duration:    atoiSafe(r.FormValue("duration")),
-        File:        fileBytes,
+        Language:    r.FormValue("language"),
+        Country:     r.FormValue("country"),
+        Rating:      float64(atoiSafe(r.FormValue("rating"))),
+        AgeRating:   r.FormValue("age_rating"),
+
+        Thumbnail: thumbnailBytes,
+        Banner:    bannerBytes,
+
+        MovieURL: moviePath,
+        Trailer:  trailerBytes,
     }
 
-    // Save movie
-    if err = h.Service.SaveMovie(movie); err != nil {
-        http.Error(w, "DB error: ❌"+err.Error(), http.StatusInternalServerError)
+    if err := h.Service.SaveMovie(movie); err != nil {
+        http.Error(w, "DB save error: "+err.Error(), http.StatusInternalServerError)
         return
     }
 
     jsonResponse(w, map[string]string{
-        "message":  "Movie '" + handler.Filename + "' uploaded successfully ✅",
-        "file_size": strconv.Itoa(len(fileBytes)),
+        "message": "Movie uploaded successfully",
+        "movie_path": moviePath,
+        "trailer_size": strconv.Itoa(len(trailerBytes)),
     })
 }
+
 
 
 // List metadata only

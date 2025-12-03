@@ -32,7 +32,7 @@ func InitDB() (*sql.DB, error) {
         country VARCHAR(100),
         thumbnail MEDIUMBLOB,
         banner MEDIUMBLOB,
-        movie VARCHAR(255) NOT NULL,
+        movie_url VARCHAR(255) NOT NULL,
         trailer LONGBLOB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
