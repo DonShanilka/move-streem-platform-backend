@@ -38,7 +38,7 @@ func InitDB() (*sql.DB, error) {
         country VARCHAR(100),
         thumbnail MEDIUMBLOB,
         banner MEDIUMBLOB,
-        file VARCHAR(255) NOT NULL,
+        movie VARCHAR(255) NOT NULL,
         trailer LONGBLOB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -85,7 +85,7 @@ func InitDB() (*sql.DB, error) {
     }
 
     // movie_cast maping
-    movieCastTable := `CREATE TABLE movie_cast (
+    movieCastTable := `CREATE TABLE IF NOT EXISTS movie_cast (
         movie_id INT,
         cast_id INT,
         role VARCHAR(100),
@@ -99,7 +99,7 @@ func InitDB() (*sql.DB, error) {
     }
 
     // Tvshows table
-    tvshowsTable := `CREATE TABLE series (
+    tvshowsTable := `CREATE TABLE IF NOT EXISTS series (
         id INT PRIMARY KEY AUTO_INCREMENT,
         title VARCHAR(255) NOT NULL,
         description TEXT,
@@ -117,7 +117,7 @@ func InitDB() (*sql.DB, error) {
     }
 
     // series_genres mapping table
-    seriesGenresTable := `CREATE TABLE series_genres (
+    seriesGenresTable := `CREATE TABLE IF NOT EXISTS series_genres (
         series_id INT,
         genre_id INT,
         PRIMARY KEY (series_id, genre_id),
@@ -130,7 +130,7 @@ func InitDB() (*sql.DB, error) {
     }
 
     // Series–Cast Mapping
-    seriesCastTable := `CREATE TABLE series_cast (
+    seriesCastTable := `CREATE TABLE IF NOT EXISTS series_cast (
         series_id INT,
         cast_id INT,
         role VARCHAR(100),
@@ -143,7 +143,24 @@ func InitDB() (*sql.DB, error) {
        return nil, err
     }
 
-
+    // Episodes Table
+    episodesTable := `CREATE TABLE IF NOT EXISTS episodes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    series_id INT NOT NULL,
+    season_number INT NOT NULL,
+    episode_number INT NOT NULL,
+    title VARCHAR(255),
+    description TEXT,
+    duration INT,
+    thumbnail_url TEXT,
+    episode VARCHAR(255) NOT NULL,
+    release_date DATE,
+    FOREIGN KEY (series_id) REFERENCES series(id) ON DELETE CASCADE
+);`
+    _, err = db.Exec(episodesTable)
+    if err != nil {
+       return nil, err
+    }
 
 	fmt.Println("✔ Database initialized: movies + genres tables created")
 	return db, nil
