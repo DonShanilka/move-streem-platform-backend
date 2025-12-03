@@ -1,0 +1,13 @@
+# -------------------------
+#  IGNORE MOVIE FILES
+# -------------------------
+# Common video formats
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mpeg
+*.mpg
