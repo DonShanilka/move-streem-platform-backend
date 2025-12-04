@@ -101,7 +101,7 @@ func InitDB() (*sql.DB, error) {
         language VARCHAR(50),
         season_count INT DEFAULT 1,
         thumbnail_url TEXT,
-        banner_url TEXT,
+        banner MEDIUMBLOB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );`
