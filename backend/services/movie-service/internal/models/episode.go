@@ -9,6 +9,6 @@ type Episode struct {
     Description   string `json:"description"`
     Duration      int    `json:"duration"`
     ThumbnailURL  string `json:"thumbnail_url"`
-    EpisodeURL    string `json:"episode"`       // stored as varchar(255)
-    ReleaseDate   string `json:"release_date"`  // use string (YYYY-MM-DD)
+    EpisodeURL    string `json:"episode"`       
+    ReleaseDate   string `json:"release_date"`  
 }
