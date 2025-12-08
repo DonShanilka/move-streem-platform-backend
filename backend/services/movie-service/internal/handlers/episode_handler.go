@@ -15,7 +15,7 @@ type EpisodeHandler struct {
 
 func NewEpisodeHandler(episode *services.EpisodeService) *EpisodeHandler {
 	return &EpisodeHandler{Episode: episode}
-}
+} 
 
 func (h *EpisodeHandler) UploadEpisode(w http.ResponseWriter, r * http.Request) {
 	if r.Method != http.MethodPost {
@@ -57,7 +57,6 @@ func (h *EpisodeHandler) UploadEpisode(w http.ResponseWriter, r * http.Request) 
 		Description:  description,
 		Duration:     atoiSafe(duration),
 		ThumbnailURL: thumbnailURL,
-		EpisodeURL:   episodePath,
 		ReleaseDate:  releaseDate,
 		EpisodeURL:   episodeHeader.Filename,
 	}
