@@ -25,15 +25,17 @@ func (h *EpisodeHandler) UploadEpisode(w http.ResponseWriter, r * http.Request) 
 
 	r.ParseMultipartForm(110 << 30)
 
-	title := r.FormValue("title")
-	description := r.FormValue("description")
-	duration := r.FormValue("duration")
-	thumbnailURL := r.FormValue("thumbnailURL")
-	// episodeURL := r.FormValue("episodeURL")
-	releaseDate := r.FormValue("releaseDate")
+	seriesID := r.FormValue("SeriesID")
+	seasonNumber := r.FormValue("SeasonNumber")
+	episodeNumber := r.FormValue("EpisodeNumber")
+	title := r.FormValue("Title")
+	description := r.FormValue("Description")
+	duration := r.FormValue("Duration")
+	thumbnailURL := r.FormValue("ThumbnailURL")
+	releaseDate := r.FormValue("ReleaseDate")
 
 	// ========== SAVE EPISODE TO LOCAL DISK ==========
-	episodeFile, episodeHeader, err := r.FormFile("episode")
+	episodeFile, episodeHeader, err := r.FormFile("EpisodeURL")
 	if err != nil {
 		http.Error(w, "Episode File missing: "+err.Error(), 400)
 		return
@@ -51,15 +53,17 @@ func (h *EpisodeHandler) UploadEpisode(w http.ResponseWriter, r * http.Request) 
 	io.Copy(f, episodeFile)
 	f.Close()
 
-	// =========== create model =================
-	episode := models.Episode {
-		Title:        title,
-		Description:  description,
-		Duration:     atoiSafe(duration),
-		ThumbnailURL: thumbnailURL,
-		ReleaseDate:  releaseDate,
-		EpisodeURL:   episodeHeader.Filename,
-	}
+	episode := models.Episode{
+    SeriesID:      atoiSafe(seriesID),
+    SeasonNumber:  atoiSafe(seasonNumber),
+    EpisodeNumber: atoiSafe(episodeNumber),
+    Title:         title,
+    Description:   description,
+    Duration:      atoiSafe(duration),
+    ThumbnailURL:  thumbnailURL,
+    EpisodeURL:    episodeHeader.Filename,
+    ReleaseDate:   releaseDate,
+}
 
 	if err := h.Episode.SaveEpisode(episode); err != nil {
 		http.Error(w, "DB Error: " + err.Error(), 500)

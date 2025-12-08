@@ -14,7 +14,7 @@ type EpisodeRepository struct {
 
 func (r *EpisodeRepository) SaveEpisode(episode models.Episode) error {
 	quary := `INSERT INTO episodes 
-		(series_id, season_number, episode_number, title, description, duration, thumbnail_url, episode_url, release_date)
+		(series_id, season_number, episode_number, title, description, duration, thumbnail_url, episode, release_date)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	_, err := r.DB.Exec(quary, 
