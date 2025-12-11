@@ -26,9 +26,9 @@ func main() {
 	episodeHandler := handlers.NewEpisodeHandler(episiodeService)
 
 	mux := http.NewServeMux()
-	routes.MovieRoutes(mux, movieHandler)
-	routes.SeriesRoutes(mux, seriesHandler)
-	routes.EpisodeRouts(mux, episodeHandler)
+	routes.RegisterMovieRoutes(mux, movieHandler)
+	routes.RegisterSeriesRoutes(mux, seriesHandler)
+	routes.RegisterEpisodeRoutes(mux, episodeHandler)
 
 	// Global CORS middleware
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
