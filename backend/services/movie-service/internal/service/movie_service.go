@@ -21,6 +21,11 @@ func (s *MovieService) SaveMovie(movie models.Movie) error {
     return s.Repo.SaveMovie(movie)
 }
 
+func (s *MovieService) UpdateMovie(movie models.Movie) error {
+    return s.Repo.UpdateMovie(movie)
+}
+
+
 func (s *MovieService) GetAllMovies() ([]models.Movie, error) {
     movies, err := s.Repo.GetAllMovies()
     if err != nil {
