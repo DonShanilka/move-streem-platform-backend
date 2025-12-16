@@ -1,22 +1,19 @@
 package models
 
 type Movie struct {
-    ID          int
-    Title       string
-    Description string
-    ReleaseYear int
-    Language    string
-    Duration    int
-    Rating      string
-    AgeRating   string
-    Country     string
+	ID          int
+	Title       string
+	Description string
+	ReleaseYear int
+	Language    string
+	Duration    int
+	Rating      string
+	AgeRating   string
+	Country     string
 
-    Thumbnail   []byte
-    Banner      []byte
+	Thumbnail []byte
+	Banner    []byte
 
-    MovieURL    string
-    Trailer     []byte
+	MovieURL string
+	Trailer  []byte
 }
-
-
-

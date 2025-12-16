@@ -21,37 +21,39 @@ func (r *MovieRepository) SaveMovie(movie models.Movie) error {
 
 	_, err := r.DB.Exec(query,
 		movie.Title,
-        movie.Description,
-        movie.ReleaseYear,
-        movie.Language,
-        movie.Duration,
-        movie.Rating,
-        movie.AgeRating,
-        movie.Country,
-        movie.Thumbnail,
-        movie.Banner,
-        movie.MovieURL,
-        movie.Trailer,
+		movie.Description,
+		movie.ReleaseYear,
+		movie.Language,
+		movie.Duration,
+		movie.Rating,
+		movie.AgeRating,
+		movie.Country,
+		movie.Thumbnail,
+		movie.Banner,
+		movie.MovieURL,
+		movie.Trailer,
 	)
 	return err
 }
 
-func (r *MovieRepository) UpdateMovie(movie models.Movie) error {
+func (r *MovieRepository) UpdateMovie(id int, movie models.Movie) error {
 
-	query := `UPDATE movies SET
-		title = ?,
-		description = ?,
-		release_year = ?,
-		language = ?,
-		duration = ?,
-		rating = ?,
-		age_rating = ?,
-		country = ?,
-		thumbnail = ?,
-		banner = ?,
-		movie_url = ?,
-		trailer = ?
-	WHERE id = ?`
+	query := `
+		UPDATE movies SET
+			title = ?,
+			description = ?,
+			release_year = ?,
+			language = ?,
+			duration = ?,
+			rating = ?,
+			age_rating = ?,
+			country = ?,
+			thumbnail = ?,
+			banner = ?,
+			trailer = ?,
+			movie_url = ?
+		WHERE id = ?
+	`
 
 	_, err := r.DB.Exec(
 		query,
@@ -65,14 +67,13 @@ func (r *MovieRepository) UpdateMovie(movie models.Movie) error {
 		movie.Country,
 		movie.Thumbnail,
 		movie.Banner,
-		movie.MovieURL,
 		movie.Trailer,
-		movie.ID,
+		movie.MovieURL,
+		id,
 	)
 
 	return err
 }
-
 
 func (r *MovieRepository) GetAllMovies() ([]models.Movie, error) {
 	query := `SELECT id, title, description, release_year, language, duration, rating,
@@ -113,7 +114,6 @@ func (r *MovieRepository) GetAllMovies() ([]models.Movie, error) {
 
 	return movies, nil
 }
-
 
 func (r *MovieRepository) GetMovieFile(id int) ([]byte, error) {
 	query := `SELECT file FROM movies WHERE id = ?`
