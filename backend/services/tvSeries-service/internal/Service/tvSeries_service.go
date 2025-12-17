@@ -1,43 +1,44 @@
-package Repository
+package Service
 
 import (
-	"context"
 	"errors"
-	"time"
 
-	"github.com/DonShanilka/movie-service/internal/Models"
+	"github.com/DonShanilka/tvSeries-service/internal/Models"
+	"github.com/DonShanilka/tvSeries-service/internal/Repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type TvSeriesRepository struct {
-	SeriesColl   *mongo.Collection
-	EpisodesColl *mongo.Collection
+type TvSeriesService struct {
+	Repo *Repository.TvSeriesRepository
 }
 
-func NewTvSeriesRepository(db *mongo.Database) *TvSeriesRepository {
-	return &TvSeriesRepository{
-		SeriesColl:   db.Collection("series"),
-		EpisodesColl: db.Collection("episodes"),
-	}
+func NewTvSeriesService(
+	repo *Repository.TvSeriesRepository,
+) *TvSeriesService {
+	return &TvSeriesService{Repo: repo}
 }
 
-// ------------------ SERIES ------------------
+// ---------------- CREATE SERIES ----------------
+func (s *TvSeriesService) CreateSeries(
+	series *Models.Series,
+) (primitive.ObjectID, error) {
 
-// Create a new TV series
-func (r *TvSeriesRepository) CreateSeries(series *Models.Series) (primitive.ObjectID, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	result, err := r.SeriesColl.InsertOne(ctx, series)
-	if err != nil {
-		return primitive.NilObjectID, err
+	if series.Title == "" {
+		return primitive.NilObjectID, errors.New("title is required")
 	}
 
-	id, ok := result.InsertedID.(primitive.ObjectID)
-	if !ok {
-		return primitive.NilObjectID, errors.New("failed to convert inserted ID to ObjectID")
+	return s.Repo.CreateSeries(series)
+}
+
+// ---------------- ADD SEASON ----------------
+func (s *TvSeriesService) AddSeason(
+	seriesID primitive.ObjectID,
+	season Models.Season,
+) error {
+
+	if season.SeasonNumber <= 0 {
+		return errors.New("invalid season number")
 	}
 
-	return id, nil
+	return s.Repo.AddSeasonToSeries(seriesID, season)
 }

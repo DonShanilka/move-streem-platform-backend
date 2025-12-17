@@ -4,10 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DonShanilka/movie-service/internal/Handler"
-	"github.com/DonShanilka/movie-service/internal/Repository"
-	"github.com/DonShanilka/movie-service/internal/Routes"
-	"github.com/DonShanilka/movie-service/internal/db"
+	"github.com/DonShanilka/tvSeries-service/internal/Handler"
+	"github.com/DonShanilka/tvSeries-service/internal/Repository"
+	"github.com/DonShanilka/tvSeries-service/internal/Routes"
+	"github.com/DonShanilka/tvSeries-service/internal/Service"
+	"github.com/DonShanilka/tvSeries-service/internal/db"
 )
 
 func main() {
@@ -17,11 +18,17 @@ func main() {
 		log.Fatal("Failed to connect to MongoDB Atlas ❌:", err)
 	}
 
-	// Create mux and repository/handler
-	mux := http.NewServeMux()
+	// Repository
 	tvSeriesRepo := Repository.NewTvSeriesRepository(database)
-	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesRepo)
-	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler) // register route
+
+	// Service
+	tvSeriesService := Service.NewTvSeriesService(tvSeriesRepo)
+
+	// Handler
+	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesService)
+
+	mux := http.NewServeMux()
+	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler)
 
 	// Start server with CORS wrapper
 	log.Println("TV Series Service running on :8080 🚀")

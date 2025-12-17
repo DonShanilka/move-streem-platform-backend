@@ -2,45 +2,79 @@ package Handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
-	"time"
 
-	"github.com/DonShanilka/movie-service/internal/Models"
-	"github.com/DonShanilka/movie-service/internal/Repository"
-	_ "go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/DonShanilka/tvSeries-service/internal/Models"
+	"github.com/DonShanilka/tvSeries-service/internal/Service"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TvSeriesHandler struct {
-	Repo *Repository.TvSeriesRepository
+	Service *Service.TvSeriesService
 }
 
-func NewTvSeriesHandler(repo *Repository.TvSeriesRepository) *TvSeriesHandler {
-	return &TvSeriesHandler{Repo: repo}
+func NewTvSeriesHandler(
+	service *Service.TvSeriesService,
+) *TvSeriesHandler {
+	return &TvSeriesHandler{Service: service}
 }
 
-func (h *TvSeriesHandler) CreateSeries(w http.ResponseWriter, r *http.Request) {
+// ---------------- CREATE SERIES ----------------
+func (h *TvSeriesHandler) CreateSeries(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var series Models.Series
 	if err := json.NewDecoder(r.Body).Decode(&series); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	series.SeasonCount = len(series.Seasons)
-	series.Seasons = nil // episodes stored separately
-
-	id, err := h.Repo.CreateSeries(&series)
+	id, err := h.Service.CreateSeries(&series)
 	if err != nil {
-		log.Println("Error creating series:", err)
-		http.Error(w, "Failed to create series", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "TV series created successfully",
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Series created",
 		"id":      id.Hex(),
-		"created": time.Now().Format(time.RFC3339),
+	})
+}
+
+// ---------------- ADD SEASON ----------------
+func (h *TvSeriesHandler) AddSeason(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	w.Header().Set("Content-Type", "application/json")
+
+	seriesIDHex := r.URL.Query().Get("seriesId")
+	if seriesIDHex == "" {
+		http.Error(w, "seriesId required", http.StatusBadRequest)
+		return
+	}
+
+	seriesID, err := primitive.ObjectIDFromHex(seriesIDHex)
+	if err != nil {
+		http.Error(w, "Invalid seriesId", http.StatusBadRequest)
+		return
+	}
+
+	var season Models.Season
+	if err := json.NewDecoder(r.Body).Decode(&season); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Service.AddSeason(seriesID, season); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Season added successfully",
 	})
 }
