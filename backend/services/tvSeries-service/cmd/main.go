@@ -7,7 +7,6 @@ import (
 	"github.com/DonShanilka/movie-service/internal/Handler"
 	"github.com/DonShanilka/movie-service/internal/Repository"
 	"github.com/DonShanilka/movie-service/internal/Routes"
-	"github.com/DonShanilka/movie-service/internal/Service"
 	"github.com/DonShanilka/movie-service/internal/db"
 )
 
@@ -18,16 +17,30 @@ func main() {
 		log.Fatal("Failed to connect to MongoDB Atlas ❌:", err)
 	}
 
-	// Create repository with MongoDB collection
-	movieRepo := Repository.NewMovieRepository(database) // expect it uses db.GetCollection("movies")
-	//movieService := Service.NewMovieService(movieRepo)
-	//movieHandler := Handler.NewMovieHandler(movieService)
+	// =========================
+	// Repositories
+	// =========================
+	movieRepo := Repository.NewMovieRepository(database.Collection("movies"))
+	tvSeriesRepo := Repository.NewTvSeriesRepository(database)
 
-	// HTTP multiplexer
-	//mux := http.NewServeMux()
-	//Routes.RegisterMovieRoutes(mux, movieHandler)
+	// =========================
+	// Handlers
+	// =========================
+	// Movies
+	movieHandler := Handler.NewMovieHandler(movieRepo)
+	// TV Series
+	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesRepo)
 
-	// CORS middleware
+	// =========================
+	// HTTP Routes
+	// =========================
+	mux := http.NewServeMux()
+	Routes.RegisterMovieRoutes(mux, movieHandler)
+	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler)
+
+	// =========================
+	// CORS Middleware
+	// =========================
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -42,6 +55,6 @@ func main() {
 		mux.ServeHTTP(w, r)
 	})
 
-	log.Println("Movie Service running on :8080 🚀")
+	log.Println("Movie & TV Series Service running on :8080 🚀")
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }
