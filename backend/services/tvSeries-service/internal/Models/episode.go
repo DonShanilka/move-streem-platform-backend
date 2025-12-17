@@ -9,6 +9,6 @@ type Episode struct {
 	Description   string
 	Duration      int
 	ThumbnailURL  string
-	EpisodeURL    string
+	Episode       string
 	ReleaseDate   string
 }
