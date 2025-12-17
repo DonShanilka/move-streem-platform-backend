@@ -9,6 +9,6 @@ import (
 
 func InitDB() (*gorm.DB, error) {
 	dsn := "root:Shanilka800@#@tcp(localhost:3306)/movies_db?parseTime=true"
-	log.Println("Database Connect Don 🚀")
+	log.Println("Database Connect Don ✅")
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }

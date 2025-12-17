@@ -26,8 +26,8 @@ func main() {
 
 	handler := http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set("Access-Control-Allow-Origin", "*")
+		writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
 		writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
 		writer.Header().Set("Access-Control-Allow-Credentials", "true")
 

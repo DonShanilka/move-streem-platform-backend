@@ -1,6 +1,7 @@
 package Models
 
 type Movie struct {
+	Id          int
 	Title       string
 	Description string
 	ReleaseYear int

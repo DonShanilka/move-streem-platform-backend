@@ -79,16 +79,56 @@ func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MovieHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
-	var movie Models.Movie
-	json.NewDecoder(r.Body).Decode(&movie)
-
-	if err := h.Service.UpdateMovie(uint(id), &movie); err != nil {
-		http.Error(w, err.Error(), 500)
+	err := r.ParseMultipartForm(50 << 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{"message": "Movie updated"})
+	// ID
+	idStr := r.FormValue("Id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid Id", http.StatusBadRequest)
+		return
+	}
+
+	// ✅ Convert ReleaseYear
+	releaseYearStr := r.FormValue("ReleaseYear")
+	releaseYear, err := strconv.Atoi(releaseYearStr)
+	if err != nil {
+		http.Error(w, "Invalid ReleaseYear", http.StatusBadRequest)
+		return
+	}
+
+	// ✅ Convert Duration
+	durationStr := r.FormValue("Duration")
+	duration, err := strconv.Atoi(durationStr)
+	if err != nil {
+		http.Error(w, "Invalid Duration", http.StatusBadRequest)
+		return
+	}
+
+	movie := Models.Movie{
+		Id:          id,
+		Title:       r.FormValue("Title"),
+		Description: r.FormValue("Description"),
+		ReleaseYear: releaseYear, // ✅ int
+		Language:    r.FormValue("Language"),
+		Duration:    duration, // ✅ int
+		Rating:      r.FormValue("Rating"),
+		AgeRating:   r.FormValue("AgeRating"),
+		Country:     r.FormValue("Country"),
+	}
+
+	if err := h.Service.UpdateMovie(uint(id), &movie); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Movie updated successfully",
+	})
 }
 
 func (h *MovieHandler) DeleteMovie(w http.ResponseWriter, r *http.Request) {
