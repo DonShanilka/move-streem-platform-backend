@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,8 +15,15 @@ var MongoClient *mongo.Client
 var MongoDB *mongo.Database
 
 func InitMongoDB() (*mongo.Database, error) {
-	// MongoDB Atlas connection URI
-	uri := "mongodb+srv://N. Shanilka:Shanilka1@#@cluster0.mongodb.net/movies_db?retryWrites=true&w=majority"
+	// Load .env
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using environment variables")
+	}
+
+	uri := os.Getenv("MONGO_URI") // load from env
+	if uri == "" {
+		log.Fatal("MONGO_URI is empty! Check your .env file")
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -25,7 +34,6 @@ func InitMongoDB() (*mongo.Database, error) {
 		return nil, err
 	}
 
-	// Ping to ensure connection is established
 	if err := client.Ping(ctx, nil); err != nil {
 		log.Println("MongoDB ping failed ❌", err)
 		return nil, err
@@ -33,14 +41,7 @@ func InitMongoDB() (*mongo.Database, error) {
 
 	log.Println("MongoDB Atlas connected ✅")
 
-	// Assign global client
 	MongoClient = client
-	MongoDB = client.Database("movies_db") // use the same database name
-
+	MongoDB = client.Database("movies_db")
 	return MongoDB, nil
-}
-
-// Helper function to get collection
-func GetCollection(collectionName string) *mongo.Collection {
-	return MongoDB.Collection(collectionName)
 }

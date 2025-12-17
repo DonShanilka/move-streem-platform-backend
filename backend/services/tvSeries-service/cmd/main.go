@@ -11,18 +11,22 @@ import (
 )
 
 func main() {
+	// Connect to MongoDB Atlas
 	database, err := db.InitMongoDB()
 	if err != nil {
 		log.Fatal("Failed to connect to MongoDB Atlas ❌:", err)
 	}
 
+	// Create mux and repository/handler
 	mux := http.NewServeMux()
-
 	tvSeriesRepo := Repository.NewTvSeriesRepository(database)
 	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesRepo)
-	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler)
+	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler) // register route
 
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// Start server with CORS wrapper
+	log.Println("TV Series Service running on :8080 🚀")
+	err = http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// CORS headers
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -33,9 +37,11 @@ func main() {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		mux.ServeHTTP(w, r)
-	})
 
-	log.Println("Movie & TV Series Service running on :8080 🚀")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+		// Route the request
+		mux.ServeHTTP(w, r)
+	}))
+	if err != nil {
+		log.Fatal(err)
+	}
 }

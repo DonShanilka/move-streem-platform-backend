@@ -11,18 +11,15 @@ import (
 )
 
 type TvSeriesRepository struct {
-	SeriesColl   *mongo.Collection
-	EpisodesColl *mongo.Collection
+	SeriesColl *mongo.Collection
 }
 
 func NewTvSeriesRepository(db *mongo.Database) *TvSeriesRepository {
 	return &TvSeriesRepository{
-		SeriesColl:   db.Collection("series"),
-		EpisodesColl: db.Collection("episodes"),
+		SeriesColl: db.Collection("series"),
 	}
 }
 
-// Create a new TV series
 func (r *TvSeriesRepository) CreateSeries(series *Models.Series) (primitive.ObjectID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
