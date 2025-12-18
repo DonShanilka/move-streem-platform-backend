@@ -3,6 +3,7 @@ package Repository
 import (
 	"context"
 	"io"
+	"strings"
 
 	"github.com/DonShanilka/tvSeries-service/internal/Models"
 	"github.com/kurin/blazer/b2"
@@ -13,6 +14,11 @@ type EpisodeRepository struct {
 	DB     *gorm.DB
 	B2     *b2.Client
 	Bucket *b2.Bucket
+}
+
+func extractB2FileName(url string) string {
+	parts := strings.Split(url, "/")
+	return parts[len(parts)-1]
 }
 
 // Create new repo with B2
@@ -52,4 +58,34 @@ func (r *EpisodeRepository) SaveEpisodeWithFile(ep *Models.Episode, file io.Read
 
 	// Save metadata to MySQL
 	return r.DB.Create(ep).Error
+}
+
+func (r *EpisodeRepository) UpdateEpisodeWithFile(
+	ep *Models.Episode,
+	file io.Reader,
+	fileName string,
+) error {
+
+	ctx := context.Background()
+
+	// 1️⃣ Delete old video if exists
+	if ep.Episode != "" {
+		oldName := extractB2FileName(ep.Episode)
+		obj := r.Bucket.Object(oldName)
+		_ = obj.Delete(ctx) // ignore error if not found
+	}
+
+	// 2️⃣ Upload new video
+	obj := r.Bucket.Object(fileName)
+	writer := obj.NewWriter(ctx)
+	if _, err := io.Copy(writer, file); err != nil {
+		return err
+	}
+	if err := writer.Close(); err != nil {
+		return err
+	}
+
+	// 3️⃣ Update DB record
+	ep.Episode = obj.URL()
+	return r.DB.Save(ep).Error
 }
