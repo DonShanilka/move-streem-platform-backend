@@ -30,3 +30,7 @@ func (s *EpisodeService) UpdateEpisode(
 func (s *EpisodeService) DeleteEpisode(id int) error {
 	return s.Repo.DeleteEpisode(id)
 }
+
+func (s *EpisodeService) GetAllEpisodes() ([]Models.Episode, error) {
+	return s.Repo.GetAll()
+}
