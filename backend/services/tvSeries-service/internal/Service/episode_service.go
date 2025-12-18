@@ -26,3 +26,7 @@ func (s *EpisodeService) UpdateEpisode(
 ) error {
 	return s.Repo.UpdateEpisodeWithFile(ep, file, fileName)
 }
+
+func (s *EpisodeService) DeleteEpisode(id int) error {
+	return s.Repo.DeleteEpisode(id)
+}
