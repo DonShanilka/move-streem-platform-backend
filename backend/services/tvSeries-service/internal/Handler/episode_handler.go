@@ -83,3 +83,15 @@ func (h *EpisodeHandler) UpdateEpisode(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(ep)
 }
+
+func (h *EpisodeHandler) DeleteEpisode(w http.ResponseWriter, r *http.Request) {
+	id := atoiSafe(r.URL.Query().Get("id"))
+
+	if err := h.Service.DeleteEpisode(id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Episode deleted successfully"))
+}
