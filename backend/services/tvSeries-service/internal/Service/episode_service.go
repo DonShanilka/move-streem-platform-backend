@@ -34,3 +34,8 @@ func (s *EpisodeService) DeleteEpisode(id int) error {
 func (s *EpisodeService) GetAllEpisodes() ([]Models.Episode, error) {
 	return s.Repo.GetAllEpisode()
 }
+
+// Business logic: get episode by ID
+func (s *EpisodeService) GetEpisodeByID(id int) (*Models.Episode, error) {
+	return s.Repo.GetEpisodeByID(id)
+}
