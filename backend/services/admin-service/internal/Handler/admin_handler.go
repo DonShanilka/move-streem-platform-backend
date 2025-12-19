@@ -3,11 +3,9 @@ package Handler
 import (
 	"encoding/json"
 	"io"
-	//"strconv"
+	"strconv"
 
-	//"io"
 	"net/http"
-	//"strconv"
 
 	"github.com/DonShanilka/admin-service/internal/Models"
 	"github.com/DonShanilka/admin-service/internal/Service"
@@ -19,6 +17,11 @@ type AdminHandler struct {
 
 func NewAdminHandler(service *Service.AdminService) *AdminHandler {
 	return &AdminHandler{Service: service}
+}
+
+func atoiSafe(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
 }
 
 func (handler *AdminHandler) CreateAdmin(writer http.ResponseWriter, request *http.Request) {
@@ -47,4 +50,42 @@ func (handler *AdminHandler) CreateAdmin(writer http.ResponseWriter, request *ht
 	json.NewEncoder(writer).Encode(map[string]string{
 		"message": "Admin created successfully",
 	})
+}
+
+func (handler *AdminHandler) UpdateAdmin(writer http.ResponseWriter, request *http.Request) {
+
+	err := request.ParseMultipartForm(100 << 20)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	idstr := request.FormValue("id")
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		http.Error(writer, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	admin := Models.Admin{
+		ID:       uint(id),
+		Name:     request.FormValue("name"),
+		Email:    request.FormValue("email"),
+		Password: request.FormValue("password"),
+	}
+
+	if file, _, err := request.FormFile("profile_image"); err == nil {
+		admin.ProfileImage, _ = io.ReadAll(file)
+		file.Close()
+	}
+
+	if err := handler.Service.UpdateAdmin(uint(id), &admin); err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(writer).Encode(map[string]string{
+		"message": "Admin updated successfully",
+	})
+
 }
