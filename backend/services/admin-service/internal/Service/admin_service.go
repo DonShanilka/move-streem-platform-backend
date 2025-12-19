@@ -16,3 +16,7 @@ func NewAdminService(repo *Repository.AdminRepository) *AdminService {
 func (service *AdminService) CreateAdmin(admin *Models.Admin) error {
 	return service.Repo.CreateAdmin(admin)
 }
+
+func (service *AdminService) UpdateAdmin(id uint, admin *Models.Admin) error {
+	return service.Repo.UpdateAdmin(id, admin)
+}
