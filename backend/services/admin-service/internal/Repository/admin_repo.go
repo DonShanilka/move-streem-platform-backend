@@ -24,3 +24,9 @@ func (repo *AdminRepository) UpdateAdmin(id uint, admin *Models.Admin) error {
 func (repo *AdminRepository) DeleteAdmin(id uint) error {
 	return repo.DB.Delete(&Models.Admin{}, id).Error
 }
+
+func (repo *AdminRepository) GetAllAdmins() ([]Models.Admin, error) {
+	var admins []Models.Admin
+	err := repo.DB.Find(&admins).Error
+	return admins, err
+}
