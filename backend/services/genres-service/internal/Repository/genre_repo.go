@@ -16,3 +16,17 @@ func NewGenerRepostry(db *gorm.DB) *GenerRepostry {
 func (r *GenerRepostry) CreateGenre(genre *Models.Genre) error {
 	return r.DB.Create(genre).Error
 }
+
+func (request *GenerRepostry) UpdateGenre(id uint, genre *Models.Genre) error {
+	return request.DB.Model(&Models.Genre{}).Where("id =?", id).Updates(genre).Error
+}
+
+func (request *GenerRepostry) DeleteGenre(id uint) error {
+	return request.DB.Delete(&Models.Genre{}, id).Error
+}
+
+func (request *GenerRepostry) GetAllGenres() ([]Models.Genre, error) {
+	var genres []Models.Genre
+	err := request.DB.Find(&genres).Error
+	return genres, err
+}
