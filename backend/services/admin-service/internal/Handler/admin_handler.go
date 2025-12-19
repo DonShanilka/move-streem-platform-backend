@@ -101,3 +101,12 @@ func (handler *AdminHandler) DeleteAdmin(writer http.ResponseWriter, request *ht
 		"message": "Admin deleted successfully",
 	})
 }
+
+func (handler *AdminHandler) GetAllAdmins(writer http.ResponseWriter, request *http.Request) {
+	admins, err := handler.Service.GetAllAdmins()
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(writer).Encode(admins)
+}

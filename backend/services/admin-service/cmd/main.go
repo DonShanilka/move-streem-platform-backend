@@ -4,12 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DonShanilka/genres-service/Middleware"
-	"github.com/DonShanilka/genres-service/internal/Handler"
-	"github.com/DonShanilka/genres-service/internal/Repository"
-	"github.com/DonShanilka/genres-service/internal/Routes"
-	"github.com/DonShanilka/genres-service/internal/Service"
-	"github.com/DonShanilka/genres-service/internal/db"
+	"github.com/DonShanilka/admin-service/Middleware"
+	"github.com/DonShanilka/admin-service/internal/Handler"
+	"github.com/DonShanilka/admin-service/internal/Repository"
+	"github.com/DonShanilka/admin-service/internal/Routes"
+	"github.com/DonShanilka/admin-service/internal/Service"
+	"github.com/DonShanilka/admin-service/internal/db"
 )
 
 func main() {
@@ -18,12 +18,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	genreRepo := Repository.NewGenerRepostry(database)
-	genreService := Service.NewGenreService(genreRepo)
-	genreHandler := Handler.NewGenreHandler(genreService)
+	adminRepo := Repository.NewAdminRepository(database)
+	adminService := Service.NewAdminService(adminRepo)
+	adminHandler := Handler.NewAdminHandler(adminService)
 
 	mux := http.NewServeMux()
-	Routes.RegisterGenreRoutes(mux, genreHandler)
+	Routes.RegisterAdminRoutes(mux, adminHandler)
 
 	log.Println("Genres Service running on :8080 🚀")
 	err = http.ListenAndServe(":8080", Middleware.CorsMiddleware(mux))

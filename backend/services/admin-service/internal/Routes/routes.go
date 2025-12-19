@@ -3,12 +3,12 @@ package Routes
 import (
 	"net/http"
 
-	"github.com/DonShanilka/genres-service/internal/Handler"
+	"github.com/DonShanilka/admin-service/internal/Handler"
 )
 
-func RegisterGenreRoutes(mux *http.ServeMux, handler *Handler.GenreHandler) {
-	mux.HandleFunc("/api/genre/creatGenres", handler.CreateGenre)
-	mux.HandleFunc("/api/genre/getAllGenre", handler.GetAllGenres)
+func RegisterAdminRoutes(mux *http.ServeMux, handler *Handler.AdminHandler) {
+	mux.HandleFunc("/api/genre/creatGenres", handler.CreateAdmin)
+	mux.HandleFunc("/api/genre/getAllGenre", handler.)
 	mux.HandleFunc("/api/genre/updateGenre", handler.UpdateGenre)
 	mux.HandleFunc("/api/genre/deleteGenre", handler.DeleteGenre)
 }
