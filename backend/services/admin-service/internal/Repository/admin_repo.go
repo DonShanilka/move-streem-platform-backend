@@ -20,3 +20,7 @@ func (repo *AdminRepository) CreateAdmin(admin *Models.Admin) error {
 func (repo *AdminRepository) UpdateAdmin(id uint, admin *Models.Admin) error {
 	return repo.DB.Model(&Models.Admin{}).Where("id = ?", id).Updates(admin).Error
 }
+
+func (repo *AdminRepository) DeleteAdmin(id uint) error {
+	return repo.DB.Delete(&Models.Admin{}, id).Error
+}
