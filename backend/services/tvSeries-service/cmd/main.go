@@ -21,22 +21,26 @@ import (
 )
 
 func main() {
-	// ------------------ DATABASE ------------------
-	sqlDB, err := db.InitDB() // MySQL/Postgres for Episodes
-	if err != nil {
-		log.Fatal("Failed to connect to SQL DB ❌:", err)
-	}
-
-	// ------------------ TV SERIES ------------------
-	tvSeriesRepo := Repository.NewTvSeriesRepository(sqlDB)
-	tvSeriesService := Service.NewTvSerriesService(tvSeriesRepo)
-	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesService)
 
 	// ------------------ EPISODES ------------------
 	// Backblaze B2 config
 	b2KeyID := "f9f45a6c989e"
 	b2AppKey := "00563942506fbf1481548bd202ea51e42ec0ce19b7"
 	b2BucketName := "movieStream"
+
+	// ------------------ DATABASE ------------------
+	sqlDB, err := db.InitDB() // MySQL/Postgres for Episodes
+	if err != nil {
+		log.Fatal("Failed to connect to SQL DB ❌:", err)
+	}
+
+	// ------------------ ROUTES ------------------
+	mux := http.NewServeMux()
+
+	// ------------------ TV SERIES ------------------
+	tvSeriesRepo := Repository.NewTvSeriesRepository(sqlDB)
+	tvSeriesService := Service.NewTvSerriesService(tvSeriesRepo)
+	tvSeriesHandler := Handler.NewTvSeriesHandler(tvSeriesService)
 
 	epRepo, err := episodeRepo.NewEpisodeRepository(sqlDB, b2KeyID, b2AppKey, b2BucketName)
 	if err != nil {
@@ -45,9 +49,6 @@ func main() {
 
 	epService := episodeService.NewEpisodeService(epRepo)
 	epHandler := episodeHandler.NewEpisodeHandler(epService)
-
-	// ------------------ ROUTES ------------------
-	mux := http.NewServeMux()
 
 	// TV Series routes
 	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler)

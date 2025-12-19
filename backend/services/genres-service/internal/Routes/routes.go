@@ -8,7 +8,7 @@ import (
 
 func RegisterGenreRoutes(mux *http.ServeMux, handler *Handler.GenreHandler) {
 	mux.HandleFunc("/api/genre/creatGenres", handler.CreateGenre)
-	//mux.HandleFunc("/api/movies/createMovie", h.CreateMovie)
-	//mux.HandleFunc("/api/movies/updateMovie", h.UpdateMovie)
-	//mux.HandleFunc("/api/movies/deleteMovie", h.DeleteMovie)
+	mux.HandleFunc("/api/genre/getAllGenre", handler.GetAllGenres)
+	mux.HandleFunc("/api/genre/updateGenre", handler.UpdateGenre)
+	mux.HandleFunc("/api/genre/deleteGenre", handler.DeleteGenre)
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/DonShanilka/genres-service/Middleware"
 	"github.com/DonShanilka/genres-service/internal/Handler"
 	"github.com/DonShanilka/genres-service/internal/Repository"
 	"github.com/DonShanilka/genres-service/internal/Routes"
@@ -24,19 +25,9 @@ func main() {
 	mux := http.NewServeMux()
 	Routes.RegisterGenreRoutes(mux, genreHandler)
 
-	handler := http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set("Access-Control-Allow-Origin", "*")
-		writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-		writer.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		if request.Method == http.MethodOptions {
-			return
-		}
-		mux.ServeHTTP(writer, request)
-	})
-
 	log.Println("Genres Service running on :8080 🚀")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	err = http.ListenAndServe(":8080", Middleware.CorsMiddleware(mux))
+	if err != nil {
+		log.Fatal(err)
+	}
 }

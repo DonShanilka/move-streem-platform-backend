@@ -99,7 +99,7 @@ func (handler *GenreHandler) DeleteGenre(writer http.ResponseWriter, request *ht
 	json.NewEncoder(writer).Encode(map[string]string{})
 }
 
-func (handler *GenreHandler) GetGenres(writer http.ResponseWriter, request *http.Request) {
+func (handler *GenreHandler) GetAllGenres(writer http.ResponseWriter, request *http.Request) {
 	genres, err := handler.Service.GetAllGenres()
 
 	if err != nil {
