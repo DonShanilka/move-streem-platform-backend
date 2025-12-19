@@ -5,16 +5,20 @@ import (
 	"gorm.io/gorm"
 )
 
+// Genre Database Manager
+// hold databse connection
 type GenerRepostry struct {
 	DB *gorm.DB
 }
 
+// Creates a ready-to-use repository
+// Injects the database dependency once
 func NewGenerRepostry(db *gorm.DB) *GenerRepostry {
 	return &GenerRepostry{DB: db}
 }
 
-func (r *GenerRepostry) CreateGenre(genre *Models.Genre) error {
-	return r.DB.Create(genre).Error
+func (request *GenerRepostry) CreateGenre(genre *Models.Genre) error {
+	return request.DB.Create(genre).Error
 }
 
 func (request *GenerRepostry) UpdateGenre(id uint, genre *Models.Genre) error {
