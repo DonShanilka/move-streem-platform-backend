@@ -18,7 +18,7 @@ func (repo *SubsRepostry) CreateSubs(subs *Models.Subscription) error {
 	return repo.DB.Create(subs).Error
 }
 
-func (repo *SubsRepostry) UpdateSubs(id uint, subs *Models.Plan) error {
+func (repo *SubsRepostry) UpdateSubs(id uint, subs *Models.Subscription) error {
 	return repo.DB.Model(&Models.Subscription{}).Where("id =?", id).Updates(subs).Error
 }
 
