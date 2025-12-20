@@ -18,12 +18,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	userRepo := Repository.NewAdminRepository(database)
-	userService := Service.NewAdminService(adminRepo)
-	userHandler := Handler.NewAdminHandler(adminService)
+	userRepo := Repository.NewUserRepository(database)
+	userService := Service.NewUserService(userRepo)
+	userHandler := Handler.NewUserHandler(userService)
 
 	mux := http.NewServeMux()
-	Routes.RegisterAdminRoutes(mux, adminHandler)
+	Routes.RegisterAdminRoutes(mux, userHandler)
 
 	log.Println("User Service running on :8080 🚀")
 	err = http.ListenAndServe(":8080", Middleware.CorsMiddleware(mux))
