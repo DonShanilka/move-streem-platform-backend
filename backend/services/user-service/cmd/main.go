@@ -18,14 +18,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	adminRepo := Repository.NewAdminRepository(database)
-	adminService := Service.NewAdminService(adminRepo)
-	adminHandler := Handler.NewAdminHandler(adminService)
+	userRepo := Repository.NewAdminRepository(database)
+	userService := Service.NewAdminService(adminRepo)
+	userHandler := Handler.NewAdminHandler(adminService)
 
 	mux := http.NewServeMux()
 	Routes.RegisterAdminRoutes(mux, adminHandler)
 
-	log.Println("Admin Service running on :8080 🚀")
+	log.Println("User Service running on :8080 🚀")
 	err = http.ListenAndServe(":8080", Middleware.CorsMiddleware(mux))
 	if err != nil {
 		log.Fatal(err)
