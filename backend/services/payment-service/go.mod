@@ -1,4 +1,4 @@
-module github.com/DonShanilka/payment-service
+module backend/payment-service
 
 go 1.24.4
 
