@@ -72,7 +72,7 @@ func atoiSafe(s string) int {
 func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
 	movies, err := h.Service.GetAllMovies()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), 500) 
 		return
 	}
 	json.NewEncoder(w).Encode(movies)

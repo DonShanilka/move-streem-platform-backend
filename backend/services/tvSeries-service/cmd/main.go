@@ -5,14 +5,13 @@ import (
 	"net/http"
 
 	"github.com/DonShanilka/tvSeries-service/Middleware"
-	_ "github.com/DonShanilka/tvSeries-service/Middleware"
+
 	// TV Series
 	"github.com/DonShanilka/tvSeries-service/internal/Handler"
 	"github.com/DonShanilka/tvSeries-service/internal/Repository"
 	"github.com/DonShanilka/tvSeries-service/internal/Routes"
 	"github.com/DonShanilka/tvSeries-service/internal/Service"
 	"github.com/DonShanilka/tvSeries-service/internal/db"
-	_ "github.com/klauspost/compress/gzhttp/writer"
 
 	// Episodes (Backblaze B2)
 	episodeHandler "github.com/DonShanilka/tvSeries-service/internal/Handler"

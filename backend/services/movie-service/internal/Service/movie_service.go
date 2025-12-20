@@ -2,9 +2,7 @@ package services
 
 import (
 	"github.com/DonShanilka/movie-service/internal/Models"
-	_ "github.com/DonShanilka/movie-service/internal/Models"
 	"github.com/DonShanilka/movie-service/internal/Repository"
-	_ "github.com/DonShanilka/movie-service/internal/Repository"
 )
 
 type MovieService struct {
