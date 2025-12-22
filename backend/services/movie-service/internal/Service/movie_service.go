@@ -1,6 +1,8 @@
 package services
 
 import (
+	"io"
+
 	"github.com/DonShanilka/movie-service/internal/Models"
 	"github.com/DonShanilka/movie-service/internal/Repository"
 )
@@ -13,18 +15,22 @@ func NewMovieService(repo *Repository.MovieRepository) *MovieService {
 	return &MovieService{Repo: repo}
 }
 
-func (s *MovieService) CreateMovie(movie *Models.Movie) error {
-	return s.Repo.Create(movie)
+func (s *MovieService) CreateMovie(movie *Models.Movie, file io.Reader, fileName string) error {
+	return s.Repo.SaveMovieWithFile(movie, file, fileName)
 }
 
-func (s *MovieService) UpdateMovie(id uint, movie *Models.Movie) error {
-	return s.Repo.Update(id, movie)
+func (s *MovieService) UpdateMovie(movie *Models.Movie, file io.Reader, fileName string) error {
+	return s.Repo.UpdateMovieWithFile(movie, file, fileName)
 }
 
 func (s *MovieService) DeleteMovie(id uint) error {
-	return s.Repo.Delete(id)
+	return s.Repo.DeleteMovie(id)
 }
 
 func (s *MovieService) GetAllMovies() ([]Models.Movie, error) {
-	return s.Repo.GetAll()
+	return s.Repo.GetAllMovie()
+}
+
+func (s *MovieService) GetMovieById(id uint) (*Models.Movie, error) {
+	return s.Repo.GetMovieByID(id)
 }
