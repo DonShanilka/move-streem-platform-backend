@@ -104,7 +104,7 @@ func (r *MovieRepository) GetAllMovie() ([]Models.Movie, error) {
 	return movies, err
 }
 
-func (r *MovieRepository) GetMovieByID(id uint) (*Models.Movie, error) {
+func (r *MovieRepository) GetMovieByID(id int) (*Models.Movie, error) {
 	var movie Models.Movie
 
 	err := r.DB.First(&movie, id).Error

@@ -31,6 +31,6 @@ func (s *MovieService) GetAllMovies() ([]Models.Movie, error) {
 	return s.Repo.GetAllMovie()
 }
 
-func (s *MovieService) GetMovieById(id uint) (*Models.Movie, error) {
+func (s *MovieService) GetMovieById(id int) (*Models.Movie, error) {
 	return s.Repo.GetMovieByID(id)
 }

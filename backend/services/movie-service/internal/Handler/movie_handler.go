@@ -24,6 +24,13 @@ func (h *MovieHandler) CreateMovie(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	file, header, err := r.FormFile("movie")
+	if err != nil {
+		http.Error(w, "Video File is Required", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
 	movie := Models.Movie{
 		Title:       r.FormValue("Title"),
 		Description: r.FormValue("Description"),
@@ -48,13 +55,9 @@ func (h *MovieHandler) CreateMovie(w http.ResponseWriter, r *http.Request) {
 		movie.Trailer, _ = io.ReadAll(file)
 		file.Close()
 	}
-	if file, header, _ := r.FormFile("Movie"); file != nil {
-		movie.MovieURL = header.Filename
-		// optionally save movie file to disk
-		file.Close()
-	}
 
-	if err := h.Service.CreateMovie(&movie); err != nil {
+	err = h.Service.CreateMovie(&movie, file, header.Filename)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -67,15 +70,6 @@ func (h *MovieHandler) CreateMovie(w http.ResponseWriter, r *http.Request) {
 func atoiSafe(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i
-}
-
-func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
-	movies, err := h.Service.GetAllMovies()
-	if err != nil {
-		http.Error(w, err.Error(), 500) 
-		return
-	}
-	json.NewEncoder(w).Encode(movies)
 }
 
 func (h *MovieHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
@@ -109,6 +103,13 @@ func (h *MovieHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	file, header, err := r.FormFile("movie")
+	if err != nil {
+		http.Error(w, "Video File is Required", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
 	movie := Models.Movie{
 		Id:          id,
 		Title:       r.FormValue("Title"),
@@ -121,7 +122,7 @@ func (h *MovieHandler) UpdateMovie(w http.ResponseWriter, r *http.Request) {
 		Country:     r.FormValue("Country"),
 	}
 
-	if err := h.Service.UpdateMovie(uint(id), &movie); err != nil {
+	if err := h.Service.UpdateMovie(&movie, file, header.Filename); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -140,4 +141,36 @@ func (h *MovieHandler) DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{"message": "Movie deleted"})
+}
+
+func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
+	movies, err := h.Service.GetAllMovies()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	json.NewEncoder(w).Encode(movies)
+}
+
+func (h *MovieHandler) GetMovieById(w http.ResponseWriter, r *http.Request) {
+	idstr := r.URL.Query().Get("id")
+	if idstr == "" {
+		http.Error(w, "Missing Movie ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		http.Error(w, "Invalid Movie ID", http.StatusBadRequest)
+		return
+	}
+
+	movie, err := h.Service.GetMovieById(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("content-type", "application/json")
+	json.NewEncoder(w).Encode(movie)
 }
