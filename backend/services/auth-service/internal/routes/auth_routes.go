@@ -9,7 +9,7 @@ import (
 
 func AuthRoutes(app *fiber.App, db *mongo.Database, cfg *config.Config) {
 
-	// Initialize the handler with EXISTING DB + config
+	// Initialize the handler with EXISTING DB + Config
 	authHandler := handlers.InitAuthHandler(db, cfg)
 
 	// Group /api/auth Routes

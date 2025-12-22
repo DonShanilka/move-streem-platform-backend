@@ -1,23 +1,28 @@
 package Models
 
-import (
-	"time"
-)
-
-type User struct {
-	//ID    uint `gorm:"primaryKey"`
-	Name  string
-	Email string
-}
+import "time"
 
 type Subscription struct {
-	ID        uint `gorm:"primaryKey"`
-	UserID    uint `gorm:"not null"` // FK column
-	User      User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	PlanID    uint
-	StartDate time.Time
-	EndDate   time.Time
-	Status    string `gorm:"type:varchar(20)"`
-	Amount    float64
+	ID uint `gorm:"primaryKey;autoIncrement"`
+
+	// 🔗 Foreign key (user-service, no relation struct needed)
+	UserID uint `gorm:"not null;index"`
+
+	// 🔗 Foreign key to plans table (local relation)
+	PlanID uint `gorm:"not null;index"`
+	Plan   Plan `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+
+	// 📅 Dates
+	StartDate time.Time `gorm:"not null"`
+	EndDate   time.Time `gorm:"not null"`
+
+	// 📌 Status
+	Status string `gorm:"type:enum('active','expired','cancelled','paused');default:'active'"`
+
+	// 💰 Payment
+	Amount float64 `gorm:"not null"`
+
+	// 🕒 Timestamps
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }

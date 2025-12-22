@@ -15,7 +15,7 @@ func main() {
 	// Load ENV
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatal("Failed to load config:", err)
+		log.Fatal("Failed to load Config:", err)
 	}
 
 	log.Println("PORT:", cfg.Port)
@@ -32,7 +32,7 @@ func main() {
 	// Setup Fiber
 	app := fiber.New()
 
-	// Pass DB + config into Routes
+	// Pass DB + Config into Routes
 	routes.AuthRoutes(app, db, cfg)
 
 	// Start server

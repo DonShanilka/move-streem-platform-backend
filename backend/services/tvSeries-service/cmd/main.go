@@ -22,7 +22,7 @@ import (
 func main() {
 
 	// ------------------ EPISODES ------------------
-	// Backblaze B2 config
+	// Backblaze B2 Config
 	b2KeyID := "f9f45a6c989e"
 	b2AppKey := "00563942506fbf1481548bd202ea51e42ec0ce19b7"
 	b2BucketName := "movieStream"

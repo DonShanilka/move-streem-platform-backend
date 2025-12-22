@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 🔒 Central DB config (no passing from main.go)
+// 🔒 Central DB Config (no passing from main.go)
 const (
 	DB_USER = "root"
 	DB_PASS = "Shanilka800@#"
