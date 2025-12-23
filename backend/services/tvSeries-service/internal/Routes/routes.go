@@ -7,11 +7,11 @@ import (
 )
 
 func RegisterTvSeriesRoutes(mux *http.ServeMux, handler *Handler.TvSeriesHandler) {
-	mux.HandleFunc("/tv-series/create", handler.CreateTvSeries)
-	mux.HandleFunc("/tv-series/update", handler.UpdateTvSeries)
-	mux.HandleFunc("/tv-series/delete", handler.DeleteTvSeries)
-	mux.HandleFunc("/tv-series/get", handler.GetTvSeriesByID)
-	mux.HandleFunc("/tv-series/list", handler.GetAllTvSeries)
+	mux.HandleFunc("/api/series/createSeries", handler.CreateTvSeries)
+	mux.HandleFunc("/api/series/updateSeries", handler.UpdateTvSeries)
+	mux.HandleFunc("/api/series/deleteSeries", handler.DeleteTvSeries)
+	mux.HandleFunc("/api/series/getByIdSeries", handler.GetTvSeriesByID)
+	mux.HandleFunc("/api/series/getAllSeries", handler.GetAllTvSeries)
 
 }
 

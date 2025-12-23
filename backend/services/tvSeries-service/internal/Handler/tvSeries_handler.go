@@ -30,6 +30,15 @@ func (h *TvSeriesHandler) CreateTvSeries(w http.ResponseWriter, r *http.Request)
 		ReleaseYear: atoiSafe(r.FormValue("releaseYear")),
 		SeasonCount: atoiSafe(r.FormValue("seasonCount")),
 		Language:    r.FormValue("language"),
+		Rating:      float64(atoiSafe("rating")),
+		Genre:       r.FormValue("genre"),
+		Country:     r.FormValue("country"),
+		AgeRating:   r.FormValue("ageRating"),
+	}
+
+	if file, _, _ := r.FormFile("trailer"); file != nil {
+		tvSeries.Trailer, _ = io.ReadAll(file)
+		file.Close()
 	}
 
 	if file, _, err := r.FormFile("banner"); err == nil && file != nil {
@@ -96,6 +105,15 @@ func (h *TvSeriesHandler) UpdateTvSeries(w http.ResponseWriter, r *http.Request)
 		ReleaseYear: atoiSafe(r.FormValue("releaseYear")),
 		SeasonCount: atoiSafe(r.FormValue("seasonCount")),
 		Language:    r.FormValue("language"),
+		Rating:      float64(atoiSafe("rating")),
+		Genre:       r.FormValue("genre"),
+		Country:     r.FormValue("country"),
+		AgeRating:   r.FormValue("ageRating"),
+	}
+
+	if file, _, _ := r.FormFile("trailer"); file != nil {
+		updateData.Trailer, _ = io.ReadAll(file)
+		file.Close()
 	}
 
 	if file, _, err := r.FormFile("banner"); err == nil && file != nil {
@@ -130,7 +148,7 @@ func (h *TvSeriesHandler) DeleteTvSeries(w http.ResponseWriter, r *http.Request)
 
 	jsonResponse(w, http.StatusOK, map[string]string{
 		"status":  "success",
-		"message": "TV series deleted",
+		"message": "TV series Deleted",
 	})
 }
 

@@ -7,5 +7,10 @@ type Series struct {
 	ReleaseYear int
 	Language    string
 	SeasonCount int
+	Country     string
+	AgeRating   string
+	Rating      float64
+	Genre       string
 	Banner      []byte
+	Trailer     []byte
 }
