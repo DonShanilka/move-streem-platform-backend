@@ -6,9 +6,13 @@ import (
 	"github.com/DonShanilka/tvSeries-service/internal/Handler"
 )
 
-func RegisterTvSeriesRoutes(mux *http.ServeMux, h *Handler.TvSeriesHandler) {
-	mux.HandleFunc("/api/series/createSeries", h.CreateTvSeries) // POST
-	//mux.HandleFunc("/api/series/add-season", h.AddSeason)
+func RegisterTvSeriesRoutes(mux *http.ServeMux, handler *Handler.TvSeriesHandler) {
+	mux.HandleFunc("/tv-series/create", handler.CreateTvSeries)
+	mux.HandleFunc("/tv-series/update", handler.UpdateTvSeries)
+	mux.HandleFunc("/tv-series/delete", handler.DeleteTvSeries)
+	mux.HandleFunc("/tv-series/get", handler.GetTvSeriesByID)
+	mux.HandleFunc("/tv-series/list", handler.GetAllTvSeries)
+
 }
 
 func RegisterEpisodeRoutes(mux *http.ServeMux, h *Handler.EpisodeHandler) {
