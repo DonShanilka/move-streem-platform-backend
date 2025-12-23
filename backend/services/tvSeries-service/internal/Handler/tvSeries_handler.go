@@ -32,7 +32,7 @@ func (h *TvSeriesHandler) CreateTvSeries(w http.ResponseWriter, r *http.Request)
 		Language:    r.FormValue("language"),
 	}
 
-	if file, _, _ := r.FormFile("banner"); file != nil {
+	if file, _, err := r.FormFile("banner"); err == nil && file != nil {
 		tvSeries.Banner, _ = io.ReadAll(file)
 		file.Close()
 	}
@@ -42,13 +42,105 @@ func (h *TvSeriesHandler) CreateTvSeries(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{
+	jsonResponse(w, http.StatusCreated, map[string]string{
 		"status":  "success",
-		"message": "Tv series created",
+		"message": "TV series created",
+	})
+}
+
+func (h *TvSeriesHandler) GetAllTvSeries(w http.ResponseWriter, r *http.Request) {
+	series, err := h.Service.GetAllTvSeries()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, series)
+}
+
+func (h *TvSeriesHandler) GetTvSeriesByID(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	id := uint(atoiSafe(idStr))
+
+	if id == 0 {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	series, err := h.Service.GetTvSeriesByID(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, series)
+}
+
+func (h *TvSeriesHandler) UpdateTvSeries(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	id := uint(atoiSafe(idStr))
+
+	if id == 0 {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	if err := r.ParseMultipartForm(100 << 20); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	updateData := Models.Series{
+		Title:       r.FormValue("title"),
+		Description: r.FormValue("description"),
+		ReleaseYear: atoiSafe(r.FormValue("releaseYear")),
+		SeasonCount: atoiSafe(r.FormValue("seasonCount")),
+		Language:    r.FormValue("language"),
+	}
+
+	if file, _, err := r.FormFile("banner"); err == nil && file != nil {
+		updateData.Banner, _ = io.ReadAll(file)
+		file.Close()
+	}
+
+	if err := h.Service.UpdateTvSeries(id, &updateData); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, map[string]string{
+		"status":  "success",
+		"message": "TV series updated",
+	})
+}
+
+func (h *TvSeriesHandler) DeleteTvSeries(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	id := uint(atoiSafe(idStr))
+
+	if id == 0 {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Service.DeleteTvSeries(id); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	jsonResponse(w, http.StatusOK, map[string]string{
+		"status":  "success",
+		"message": "TV series deleted",
 	})
 }
 
 func atoiSafe(value string) int {
 	i, _ := strconv.Atoi(value)
 	return i
+}
+
+func jsonResponse(w http.ResponseWriter, status int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
 }
