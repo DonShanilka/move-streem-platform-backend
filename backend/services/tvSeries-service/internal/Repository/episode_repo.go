@@ -91,6 +91,7 @@ func (r *EpisodeRepository) UpdateEpisodeWithFile(
 	return r.DB.Save(ep).Error
 }
 
+
 func (r *EpisodeRepository) DeleteEpisode(id int) error {
 	var ep Models.Episode
 
