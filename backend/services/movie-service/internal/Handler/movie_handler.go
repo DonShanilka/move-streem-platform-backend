@@ -153,7 +153,7 @@ func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// 🔥 Forward Range header
+		// 🔥 Forward Range header (CRITICAL)
 		if rangeHeader := r.Header.Get("Range"); rangeHeader != "" {
 			req.Header.Set("Range", rangeHeader)
 		}
@@ -166,23 +166,23 @@ func (h *MovieHandler) GetAllMovies(w http.ResponseWriter, r *http.Request) {
 		}
 		defer resp.Body.Close()
 
-		// 🔥 Copy headers (VERY IMPORTANT)
-		w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+		// 🔥 COPY ALL HEADERS
+		for k, v := range resp.Header {
+			w.Header()[k] = v
+		}
+
+		// 🔥 VERY IMPORTANT
 		w.Header().Set("Accept-Ranges", "bytes")
 
-		if resp.Header.Get("Content-Range") != "" {
-			w.Header().Set("Content-Range", resp.Header.Get("Content-Range"))
-		}
-		if resp.Header.Get("Content-Length") != "" {
-			w.Header().Set("Content-Length", resp.Header.Get("Content-Length"))
-		}
-
+		// 🔥 Return EXACT status code (206)
 		w.WriteHeader(resp.StatusCode)
+
+		// 🔥 Stream body
 		io.Copy(w, resp.Body)
 		return
 	}
 
-	// 🔵 Return movie list
+	// 🔵 Movie list
 	movies, err := h.Service.GetAllMovies()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
