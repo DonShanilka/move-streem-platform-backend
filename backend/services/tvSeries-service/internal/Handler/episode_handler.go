@@ -131,7 +131,6 @@ func (h *EpisodeHandler) GetEpisodeByID(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *EpisodeHandler) GetEpisodesBySeriesID(w http.ResponseWriter, r *http.Request) {
-	// Get "seriesId" from query params
 	seriesIDStr := r.URL.Query().Get("seriesId")
 	if seriesIDStr == "" {
 		http.Error(w, "seriesId is required", http.StatusBadRequest)
@@ -144,14 +143,12 @@ func (h *EpisodeHandler) GetEpisodesBySeriesID(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Fetch episodes from service
 	episodes, err := h.Service.GetEpisodesBySeriesID(seriesID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return JSON response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(episodes)
 }
