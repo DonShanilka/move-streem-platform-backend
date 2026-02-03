@@ -22,4 +22,6 @@ func RegisterEpisodeRoutes(mux *http.ServeMux, h *Handler.EpisodeHandler) {
 	mux.HandleFunc("/api/episode/deleteEpisode", h.DeleteEpisode)
 	mux.HandleFunc("/api/episode/getAllEpisode", h.GetAllEpisodes)
 	mux.HandleFunc("/api/episode/getEpisodeById", h.GetEpisodeByID)
+	mux.HandleFunc("/api/episodes/bySeriesId", h.GetEpisodesBySeriesID)
+
 }

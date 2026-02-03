@@ -39,3 +39,7 @@ func (s *EpisodeService) GetAllEpisodes() ([]Models.Episode, error) {
 func (s *EpisodeService) GetEpisodeByID(id int) (*Models.Episode, error) {
 	return s.Repo.GetEpisodeByID(id)
 }
+
+func (s *EpisodeService) GetEpisodesBySeriesID(seriesID int) ([]Models.Episode, error) {
+	return s.Repo.GetEpisodesBySeriesID(seriesID)
+}

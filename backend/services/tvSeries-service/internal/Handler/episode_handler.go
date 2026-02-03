@@ -129,3 +129,29 @@ func (h *EpisodeHandler) GetEpisodeByID(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(episode)
 }
+
+func (h *EpisodeHandler) GetEpisodesBySeriesID(w http.ResponseWriter, r *http.Request) {
+	// Get "seriesId" from query params
+	seriesIDStr := r.URL.Query().Get("seriesId")
+	if seriesIDStr == "" {
+		http.Error(w, "seriesId is required", http.StatusBadRequest)
+		return
+	}
+
+	seriesID, err := strconv.Atoi(seriesIDStr)
+	if err != nil {
+		http.Error(w, "invalid seriesId", http.StatusBadRequest)
+		return
+	}
+
+	// Fetch episodes from service
+	episodes, err := h.Service.GetEpisodesBySeriesID(seriesID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Return JSON response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(episodes)
+}

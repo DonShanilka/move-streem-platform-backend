@@ -17,6 +17,7 @@ type EpisodeRepository struct {
 	Bucket *b2.Bucket
 }
 
+// Extract file name from B2 URL
 func extractB2FileName(url string) string {
 	parts := strings.Split(url, "/")
 	return parts[len(parts)-1]
@@ -54,29 +55,25 @@ func (r *EpisodeRepository) SaveEpisodeWithFile(ep *Models.Episode, file io.Read
 		return err
 	}
 
-	// Save B2 URL in correct field (matching MySQL)
+	// Save B2 URL in episode field
 	ep.Episode = obj.URL()
 
-	// Save metadata to MySQL
+	// Save metadata to DB
 	return r.DB.Create(ep).Error
 }
 
-func (r *EpisodeRepository) UpdateEpisodeWithFile(
-	ep *Models.Episode,
-	file io.Reader,
-	fileName string,
-) error {
-
+// Update episode with new file
+func (r *EpisodeRepository) UpdateEpisodeWithFile(ep *Models.Episode, file io.Reader, fileName string) error {
 	ctx := context.Background()
 
-	// 1️⃣ Delete old video if exists
+	// Delete old video if exists
 	if ep.Episode != "" {
 		oldName := extractB2FileName(ep.Episode)
 		obj := r.Bucket.Object(oldName)
 		_ = obj.Delete(ctx) // ignore error if not found
 	}
 
-	// 2️⃣ Upload new video
+	// Upload new video
 	obj := r.Bucket.Object(fileName)
 	writer := obj.NewWriter(ctx)
 	if _, err := io.Copy(writer, file); err != nil {
@@ -86,50 +83,65 @@ func (r *EpisodeRepository) UpdateEpisodeWithFile(
 		return err
 	}
 
-	// 3️⃣ Update DB record
+	// Update DB record
 	ep.Episode = obj.URL()
 	return r.DB.Save(ep).Error
 }
 
-
+// Delete episode and B2 file
 func (r *EpisodeRepository) DeleteEpisode(id int) error {
 	var ep Models.Episode
 
-	// 1️⃣ Find episode
 	if err := r.DB.First(&ep, id).Error; err != nil {
 		return err
 	}
 
 	ctx := context.Background()
-
-	// 2️⃣ Delete video from B2
 	if ep.Episode != "" {
 		fileName := extractB2FileName(ep.Episode)
 		obj := r.Bucket.Object(fileName)
 		_ = obj.Delete(ctx)
 	}
 
-	// 3️⃣ Delete DB record
 	return r.DB.Delete(&ep).Error
 }
 
+// Get all episodes
 func (r *EpisodeRepository) GetAllEpisode() ([]Models.Episode, error) {
-	var episode []Models.Episode
-	err := r.DB.Find(&episode).Error
-	return episode, err
+	var episodes []Models.Episode
+	err := r.DB.Find(&episodes).Error
+	return episodes, err
 }
 
 // Get episode by ID
 func (r *EpisodeRepository) GetEpisodeByID(id int) (*Models.Episode, error) {
-	var episode Models.Episode
-
-	err := r.DB.First(&episode, id).Error
+	var ep Models.Episode
+	err := r.DB.First(&ep, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("episode not found")
 		}
 		return nil, err
 	}
+	return &ep, nil
+}
 
-	return &episode, nil
+// Get episodes by SeriesID (GORM version)
+func (r *EpisodeRepository) GetEpisodesBySeriesID(seriesID int) ([]Models.Episode, error) {
+	var episodes []Models.Episode
+
+	err := r.DB.
+		Where("series_id = ?", seriesID).
+		Order("episode_number ASC").
+		Find(&episodes).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(episodes) == 0 {
+		return nil, errors.New("no episodes found for this series")
+	}
+
+	return episodes, nil
 }
