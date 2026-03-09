@@ -32,8 +32,8 @@ func main() {
 	Routes.RegisterPlanRoutes(mux, planHandler)
 	Routes.RegisterSubsRoutes(mux, subsHandler)
 
-	log.Println("Plan & Subs Service running on :8080 🚀")
-	err = http.ListenAndServe(":8080", Middleware.CorsMiddleware(mux))
+	log.Println("Plan & Subs Service running on :8085 🚀")
+	err = http.ListenAndServe(":8085", Middleware.CorsMiddleware(mux))
 	if err != nil {
 		log.Fatal(err)
 	}
