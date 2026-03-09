@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: admin-service
-          image: admin-service:latest
+          image: backend-admin-service:latest
+          imagePullPolicy: Never
           env:
             - name: DB_HOST
               value: "mysql"

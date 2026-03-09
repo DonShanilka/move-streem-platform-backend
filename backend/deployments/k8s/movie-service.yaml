@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: movie-service
-          image: movie-service:latest
+          image: backend-movie-service:latest
+          imagePullPolicy: Never
           env:
             - name: DB_HOST
               value: "mysql"

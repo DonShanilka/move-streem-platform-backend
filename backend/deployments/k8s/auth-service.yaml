@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: auth-service:latest
+          image: backend-auth-service:latest
+          imagePullPolicy: Never
           env:
             - name: PORT
               value: "8081"

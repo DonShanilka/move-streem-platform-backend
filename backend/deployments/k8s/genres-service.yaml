@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: genres-service
-          image: genres-service:latest
+          image: backend-genres-service:latest
+          imagePullPolicy: Never
           env:
             - name: DB_HOST
               value: "mysql"
