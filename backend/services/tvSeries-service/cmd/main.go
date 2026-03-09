@@ -44,9 +44,9 @@ func main() {
 	Routes.RegisterTvSeriesRoutes(mux, tvSeriesHandler)
 	Routes.RegisterEpisodeRoutes(mux, epHandler)
 
-	log.Println("TV Series Service running on :8081 🚀")
+	log.Println("TV Series Service running on :8086 🚀")
 
-	err = http.ListenAndServe(":8081", Middleware.CorsMiddleware(mux))
+	err = http.ListenAndServe(":8086", Middleware.CorsMiddleware(mux))
 	if err != nil {
 		log.Fatal(err)
 	}

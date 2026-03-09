@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # Databases
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: Shanilka800@#
+      MYSQL_DATABASE: movies_db
+    ports:
+      - "3307:3306"
+    networks:
+      - movie-stream-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pShanilka800@#"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - movie-stream-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Services
+  auth-service:
+    build:
+      context: ./services/auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DB=movies_db
+      - JWT_SECRET=your_jwt_secret
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  user-service:
+    build:
+      context: ./services/user-service
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  admin-service:
+    build:
+      context: ./services/admin-service
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  movie-service:
+    build:
+      context: ./services/movie-service
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  genres-service:
+    build:
+      context: ./services/genres-service
+    ports:
+      - "8084:8084"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  payment-service:
+    build:
+      context: ./services/payment-service
+    ports:
+      - "8085:8085"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+  tvseries-service:
+    build:
+      context: ./services/tvSeries-service
+    ports:
+      - "8086:8086"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - movie-stream-network
+
+networks:
+  movie-stream-network:
+    driver: bridge

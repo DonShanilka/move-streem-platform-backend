@@ -1,4 +1,4 @@
-FROM goland:1.22
+FROM golang:1.24
 
 WORKDIR /app
 
@@ -9,6 +9,6 @@ COPY . .
 
 RUN go build -o main ./cmd
 
-EXPOSE 8081
+EXPOSE 8086
 
 CMD ["./main"]

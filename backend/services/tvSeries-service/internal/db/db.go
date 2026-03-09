@@ -1,14 +1,25 @@
 package db
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func InitDB() (*gorm.DB, error) {
-	dns := "root:Shanilka800@#@tcp(localhost:3306)/movies_db?parseTime=true"
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		dbHost = "localhost"
+	}
+	dbPort := os.Getenv("DB_PORT")
+	if dbPort == "" {
+		dbPort = "3306"
+	}
+
+	dns := fmt.Sprintf("root:Shanilka800@#@tcp(%s:%s)/movies_db?parseTime=true", dbHost, dbPort)
 	log.Printf("Database Connect Don ✅")
 	return gorm.Open(mysql.Open(dns), &gorm.Config{})
 }

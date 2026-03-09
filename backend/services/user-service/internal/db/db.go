@@ -4,18 +4,27 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/DonShanilka/user-service/internal/Models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
+// GetEnv helper to provide default values
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
 // 🔒 Central DB Config (no passing from main.go)
-const (
+var (
 	DB_USER = "root"
 	DB_PASS = "Shanilka800@#"
-	DB_HOST = "localhost"
-	DB_PORT = "3306"
+	DB_HOST = GetEnv("DB_HOST", "localhost")
+	DB_PORT = GetEnv("DB_PORT", "3306")
 	DB_NAME = "movies_db"
 )
 
