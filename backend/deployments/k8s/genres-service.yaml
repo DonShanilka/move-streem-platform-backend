@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: genres-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: genres-service
+  template:
+    metadata:
+      labels:
+        app: genres-service
+    spec:
+      containers:
+        - name: genres-service
+          image: genres-service:latest
+          env:
+            - name: DB_HOST
+              value: "mysql"
+            - name: DB_PORT
+              value: "3306"
+          ports:
+            - containerPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: genres-service
+spec:
+  selector:
+    app: genres-service
+  ports:
+    - protocol: TCP
+      port: 8084
+      targetPort: 8084

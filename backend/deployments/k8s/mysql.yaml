@@ -22,7 +22,7 @@ spec:
               value: "movies_db"
           ports:
             - containerPort: 3306
-          healthCheck:
+          livenessProbe:
             exec:
               command:
                 [
@@ -35,6 +35,20 @@ spec:
                   "-pShanilka800@#",
                 ]
             initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                [
+                  "mysqladmin",
+                  "ping",
+                  "-h",
+                  "localhost",
+                  "-u",
+                  "root",
+                  "-pShanilka800@#",
+                ]
+            initialDelaySeconds: 5
             periodSeconds: 10
 ---
 apiVersion: v1
